@@ -21,8 +21,6 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [panchayaths, setPanchayaths] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [subCategories, setSubCategories] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
   
   const [selectedPanchayath, setSelectedPanchayath] = useState("");
@@ -30,52 +28,27 @@ const Index = () => {
   const [name, setName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [age, setAge] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [customProgram, setCustomProgram] = useState("");
 
   useEffect(() => {
     fetchPanchayaths();
-    fetchCategories();
+    fetchPrograms();
   }, []);
-
-  useEffect(() => {
-    if (selectedCategory) {
-      fetchSubCategories(selectedCategory);
-    }
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    if (selectedSubCategory) {
-      fetchPrograms(selectedSubCategory);
-    }
-  }, [selectedSubCategory]);
 
   const fetchPanchayaths = async () => {
     const { data } = await supabase.from("panchayaths").select("*").order("name");
     if (data) setPanchayaths(data);
   };
 
-  const fetchCategories = async () => {
-    const { data } = await supabase.from("categories").select("*").order("name");
-    if (data) setCategories(data);
-  };
-
-  const fetchSubCategories = async (categoryId: string) => {
-    const { data } = await supabase
-      .from("sub_categories")
-      .select("*")
-      .eq("category_id", categoryId)
-      .order("name");
-    if (data) setSubCategories(data);
-  };
-
-  const fetchPrograms = async (subCategoryId: string) => {
+  const fetchPrograms = async () => {
     const { data } = await supabase
       .from("programs")
-      .select("*")
-      .eq("sub_category_id", subCategoryId)
+      .select(`
+        *,
+        category:categories(name),
+        sub_category:sub_categories(name)
+      `)
       .order("name");
     if (data) setPrograms(data);
   };
@@ -125,14 +98,16 @@ const Index = () => {
 
     setLoading(true);
 
+    const selectedProgramData = programs.find(p => p.id === selectedProgram);
+    
     const { error } = await supabase.from("survey_responses").insert({
       panchayath_id: selectedPanchayath,
       ward_number: parseInt(selectedWard),
       name,
       mobile_number: mobileNumber,
       age: parseInt(age),
-      category_id: selectedCategory || null,
-      sub_category_id: selectedSubCategory || null,
+      category_id: selectedProgramData?.category_id || null,
+      sub_category_id: selectedProgramData?.sub_category_id || null,
       program_id: selectedProgram || null,
       custom_program: customProgram || null,
     });
@@ -170,6 +145,11 @@ const Index = () => {
               <p><strong>Mobile:</strong> {mobileNumber}</p>
               <p><strong>Age:</strong> {age}</p>
               <p><strong>Ward:</strong> {selectedWard}</p>
+              <p><strong>Program:</strong> {
+                selectedProgram 
+                  ? programs.find(p => p.id === selectedProgram)?.name 
+                  : customProgram
+              }</p>
             </div>
             <Button
               onClick={() => window.location.reload()}
@@ -282,69 +262,20 @@ const Index = () => {
                 />
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select value={selectedCategory} onValueChange={(val) => {
-                    setSelectedCategory(val);
-                    setSelectedSubCategory("");
-                    setSelectedProgram("");
-                  }}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      {categories.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subcategory">Sub-Category</Label>
-                  <Select 
-                    value={selectedSubCategory} 
-                    onValueChange={(val) => {
-                      setSelectedSubCategory(val);
-                      setSelectedProgram("");
-                    }}
-                    disabled={!selectedCategory}
-                  >
-                    <SelectTrigger id="subcategory">
-                      <SelectValue placeholder="Select sub-category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      {subCategories.map((sc) => (
-                        <SelectItem key={sc.id} value={sc.id}>
-                          {sc.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="program">Program</Label>
-                  <Select 
-                    value={selectedProgram} 
-                    onValueChange={setSelectedProgram}
-                    disabled={!selectedSubCategory}
-                  >
-                    <SelectTrigger id="program">
-                      <SelectValue placeholder="Select program" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      {programs.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="program">Select Program</Label>
+                <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+                  <SelectTrigger id="program">
+                    <SelectValue placeholder="Select program" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    {programs.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.category?.name} - {p.sub_category?.name} - {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
