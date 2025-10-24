@@ -98,6 +98,23 @@ const Index = () => {
 
     setLoading(true);
 
+    // Check for duplicate mobile number
+    const { data: existingResponse } = await supabase
+      .from("survey_responses")
+      .select("id")
+      .eq("mobile_number", mobileNumber)
+      .maybeSingle();
+
+    if (existingResponse) {
+      toast({
+        title: "Duplicate Entry",
+        description: "This mobile number has already been submitted.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     const selectedProgramData = programs.find(p => p.id === selectedProgram);
     
     const { error } = await supabase.from("survey_responses").insert({
