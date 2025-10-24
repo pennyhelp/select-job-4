@@ -167,11 +167,14 @@ const Index = () => {
     <div className="min-h-screen bg-[var(--gradient-hero)] py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-3">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-3">
             Self Employment Program Survey
           </h1>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-4">
+            സ്വയം തൊഴിൽ പദ്ധതി സർവേ
+          </h2>
           <p className="text-lg text-muted-foreground">
-            Help us understand your employment preferences
+            Help us understand your employment preferences / നിങ്ങളുടെ തൊഴിൽ മുൻഗണനകൾ മനസ്സിലാക്കാൻ ഞങ്ങളെ സഹായിക്കുക
           </p>
           <Link to="/auth">
             <Button variant="outline" size="sm" className="mt-4">
@@ -180,19 +183,21 @@ const Index = () => {
           </Link>
         </div>
 
-        <Card className="shadow-elevated">
+        <Card className="shadow-elevated bg-[var(--gradient-card)] border-2">
           <CardHeader>
-            <CardTitle>Survey Form</CardTitle>
-            <CardDescription>Please fill in all the required information</CardDescription>
+            <CardTitle className="text-2xl">Survey Form / സർവേ ഫോം</CardTitle>
+            <CardDescription>Please fill in all the required information / ആവശ്യമായ എല്ലാ വിവരങ്ങളും പൂരിപ്പിക്കുക</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="panchayath">Panchayath *</Label>
+                  <Label htmlFor="panchayath" className="text-base">
+                    Panchayath / പഞ്ചായത്ത് *
+                  </Label>
                   <Select value={selectedPanchayath} onValueChange={setSelectedPanchayath}>
-                    <SelectTrigger id="panchayath">
-                      <SelectValue placeholder="Select panchayath" />
+                    <SelectTrigger id="panchayath" className="border-2">
+                      <SelectValue placeholder="Select panchayath / പഞ്ചായത്ത് തിരഞ്ഞെടുക്കുക" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-50">
                       {panchayaths.map((p) => (
@@ -205,15 +210,17 @@ const Index = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="ward">Ward Number *</Label>
+                  <Label htmlFor="ward" className="text-base">
+                    Ward Number / വാർഡ് നമ്പർ *
+                  </Label>
                   <Select value={selectedWard} onValueChange={setSelectedWard} disabled={!selectedPanchayath}>
-                    <SelectTrigger id="ward">
-                      <SelectValue placeholder="Select ward" />
+                    <SelectTrigger id="ward" className="border-2">
+                      <SelectValue placeholder="Select ward / വാർഡ് തിരഞ്ഞെടുക്കുക" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-50">
                       {wardNumbers.map((num) => (
                         <SelectItem key={num} value={num.toString()}>
-                          Ward {num}
+                          Ward {num} / വാർഡ് {num}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -223,50 +230,61 @@ const Index = () => {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name *</Label>
+                  <Label htmlFor="name" className="text-base">
+                    Name / പേര് *
+                  </Label>
                   <Input
                     id="name"
-                    placeholder="Enter your name"
+                    placeholder="Enter your name / നിങ്ങളുടെ പേര്"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                     maxLength={100}
+                    className="border-2"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="mobile">Mobile Number *</Label>
+                  <Label htmlFor="mobile" className="text-base">
+                    Mobile Number / മൊബൈൽ നമ്പർ *
+                  </Label>
                   <Input
                     id="mobile"
                     type="tel"
-                    placeholder="10-digit mobile number"
+                    placeholder="10-digit / 10 അക്കം"
                     value={mobileNumber}
                     onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
                     required
                     maxLength={10}
+                    className="border-2"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="age">Age *</Label>
+                <Label htmlFor="age" className="text-base">
+                  Age / പ്രായം *
+                </Label>
                 <Input
                   id="age"
                   type="number"
-                  placeholder="Enter your age"
+                  placeholder="Enter your age / പ്രായം"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
                   required
                   min="1"
                   max="150"
+                  className="border-2"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="program">Select Program</Label>
+                <Label htmlFor="program" className="text-base">
+                  Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക
+                </Label>
                 <Select value={selectedProgram} onValueChange={setSelectedProgram}>
-                  <SelectTrigger id="program">
-                    <SelectValue placeholder="Select program" />
+                  <SelectTrigger id="program" className="border-2">
+                    <SelectValue placeholder="Select program / പദ്ധതി തിരഞ്ഞെടുക്കുക" />
                   </SelectTrigger>
                   <SelectContent className="bg-popover z-50">
                     {programs.map((p) => (
@@ -279,24 +297,27 @@ const Index = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="custom">Your Own Program (if not listed above)</Label>
+                <Label htmlFor="custom" className="text-base">
+                  Your Own Program (if not listed above) / നിങ്ങളുടെ സ്വന്തം പദ്ധതി
+                </Label>
                 <Input
                   id="custom"
-                  placeholder="Enter your program idea"
+                  placeholder="Enter your program idea / നിങ്ങളുടെ പദ്ധതി"
                   value={customProgram}
                   onChange={(e) => setCustomProgram(e.target.value)}
                   maxLength={200}
+                  className="border-2"
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full text-lg py-6 shadow-glow" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
+                    Submitting... / സമർപ്പിക്കുന്നു...
                   </>
                 ) : (
-                  "Submit Survey"
+                  "Submit Survey / സമർപ്പിക്കുക"
                 )}
               </Button>
             </form>
