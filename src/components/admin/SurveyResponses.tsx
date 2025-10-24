@@ -4,8 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Download, FileDown } from "lucide-react";
+import { Download, FileDown, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -23,6 +27,9 @@ const SurveyResponses = () => {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterSubCategory, setFilterSubCategory] = useState("");
   const [filterProgram, setFilterProgram] = useState("");
+
+  const [editingResponse, setEditingResponse] = useState<any>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchResponses();
@@ -138,6 +145,58 @@ const SurveyResponses = () => {
     toast({ title: "Success", description: "Exported to PDF successfully" });
   };
 
+  const handleEdit = (response: any) => {
+    setEditingResponse(response);
+  };
+
+  const handleUpdate = async () => {
+    if (!editingResponse) return;
+
+    const { error } = await supabase
+      .from("survey_responses")
+      .update({
+        name: editingResponse.name,
+        mobile_number: editingResponse.mobile_number,
+        age: editingResponse.age,
+        ward_number: editingResponse.ward_number,
+        custom_program: editingResponse.custom_program,
+      })
+      .eq("id", editingResponse.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Success", description: "Response updated successfully" });
+      setEditingResponse(null);
+      fetchResponses();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    const { error } = await supabase
+      .from("survey_responses")
+      .delete()
+      .eq("id", deleteId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Success", description: "Response deleted successfully" });
+      setDeleteId(null);
+      fetchResponses();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -228,6 +287,7 @@ const SurveyResponses = () => {
                   <TableHead>Sub-Category</TableHead>
                   <TableHead>Program</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -248,6 +308,24 @@ const SurveyResponses = () => {
                     <TableCell>
                       {new Date(r.created_at).toLocaleDateString()}
                     </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(r)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => setDeleteId(r.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -261,6 +339,106 @@ const SurveyResponses = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingResponse} onOpenChange={() => setEditingResponse(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Survey Response</DialogTitle>
+            <DialogDescription>Update the survey response details</DialogDescription>
+          </DialogHeader>
+          {editingResponse && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name">Name</Label>
+                <Input
+                  id="edit-name"
+                  value={editingResponse.name}
+                  onChange={(e) =>
+                    setEditingResponse({ ...editingResponse, name: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-mobile">Mobile Number</Label>
+                <Input
+                  id="edit-mobile"
+                  value={editingResponse.mobile_number}
+                  onChange={(e) =>
+                    setEditingResponse({
+                      ...editingResponse,
+                      mobile_number: e.target.value.replace(/\D/g, "").slice(0, 10),
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-age">Age</Label>
+                <Input
+                  id="edit-age"
+                  type="number"
+                  value={editingResponse.age}
+                  onChange={(e) =>
+                    setEditingResponse({
+                      ...editingResponse,
+                      age: parseInt(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-ward">Ward Number</Label>
+                <Input
+                  id="edit-ward"
+                  type="number"
+                  value={editingResponse.ward_number}
+                  onChange={(e) =>
+                    setEditingResponse({
+                      ...editingResponse,
+                      ward_number: parseInt(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-custom-program">Custom Program</Label>
+                <Input
+                  id="edit-custom-program"
+                  value={editingResponse.custom_program || ""}
+                  onChange={(e) =>
+                    setEditingResponse({
+                      ...editingResponse,
+                      custom_program: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingResponse(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdate}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the survey response.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
