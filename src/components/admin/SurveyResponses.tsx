@@ -48,7 +48,7 @@ const SurveyResponses = () => {
       .from("survey_responses")
       .select(`
         *,
-        panchayaths(name, district),
+        panchayaths(name_en, name_ml, district),
         categories(name),
         sub_categories(name),
         programs(name)
@@ -58,7 +58,7 @@ const SurveyResponses = () => {
   };
 
   const fetchPanchayaths = async () => {
-    const { data } = await supabase.from("panchayaths").select("*").order("name");
+    const { data } = await supabase.from("panchayaths").select("*").order("name_en");
     if (data) setPanchayaths(data);
   };
 
@@ -101,7 +101,8 @@ const SurveyResponses = () => {
       Name: r.name,
       "Mobile Number": r.mobile_number,
       Age: r.age,
-      Panchayath: r.panchayaths?.name,
+      Panchayath: r.panchayaths?.name_en,
+      "Panchayath (ML)": r.panchayaths?.name_ml,
       District: r.panchayaths?.district,
       Ward: r.ward_number,
       Category: r.categories?.name || "N/A",
@@ -128,7 +129,7 @@ const SurveyResponses = () => {
       r.name,
       r.mobile_number,
       r.age,
-      r.panchayaths?.name,
+      r.panchayaths?.name_en,
       r.ward_number,
       r.categories?.name || "N/A",
       r.programs?.name || r.custom_program || "N/A",
@@ -214,7 +215,7 @@ const SurveyResponses = () => {
                 <SelectItem value=" ">All Panchayaths</SelectItem>
                 {panchayaths.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
-                    {p.name}
+                    {p.name_en} / {p.name_ml}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -297,7 +298,7 @@ const SurveyResponses = () => {
                     <TableCell>{r.mobile_number}</TableCell>
                     <TableCell>{r.age}</TableCell>
                     <TableCell>
-                      {r.panchayaths?.name} ({r.panchayaths?.district})
+                      {r.panchayaths?.name_en} / {r.panchayaths?.name_ml} ({r.panchayaths?.district})
                     </TableCell>
                     <TableCell>{r.ward_number}</TableCell>
                     <TableCell>{r.categories?.name || "—"}</TableCell>

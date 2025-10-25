@@ -40,7 +40,7 @@ const Index = () => {
   }, []);
 
   const fetchPanchayaths = async () => {
-    const { data } = await supabase.from("panchayaths").select("*").order("name");
+    const { data } = await supabase.from("panchayaths").select("*").order("name_en");
     if (data) setPanchayaths(data);
   };
 
@@ -257,7 +257,7 @@ const Index = () => {
                     <SelectContent className="bg-popover z-50">
                       {panchayaths.map((p) => (
                         <SelectItem key={p.id} value={p.id}>
-                          {p.name} ({p.district})
+                          {p.name_en} / {p.name_ml} ({p.district})
                         </SelectItem>
                       ))}
                     </SelectContent>
