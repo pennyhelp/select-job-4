@@ -197,8 +197,20 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--gradient-hero)] py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[var(--gradient-hero)]">
+      <nav className="border-b bg-card/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <h3 className="font-semibold text-lg">Survey Portal</h3>
+          <Link to="/auth">
+            <Button variant="outline" size="sm">
+              Admin Login
+            </Button>
+          </Link>
+        </div>
+      </nav>
+      
+      <div className="py-12 px-4">
+        <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-3">
             Self Employment Program Survey
@@ -224,12 +236,6 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
-
-          <Link to="/auth">
-            <Button variant="outline" size="sm" className="mt-2">
-              Admin Login
-            </Button>
-          </Link>
         </div>
 
         <Card className="shadow-elevated bg-[var(--gradient-card)] border-2">
@@ -372,6 +378,7 @@ const Index = () => {
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
