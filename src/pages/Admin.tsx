@@ -52,11 +52,11 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card shadow-sm">
+    <div className="min-h-screen" style={{ background: 'var(--gradient-admin)' }}>
+      <header className="border-b shadow-sm" style={{ background: 'var(--navbar-bg)' }}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-          <Button onClick={handleLogout} variant="outline" size="sm">
+          <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
+          <Button onClick={handleLogout} variant="secondary" size="sm">
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>

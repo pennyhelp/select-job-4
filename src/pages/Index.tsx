@@ -198,11 +198,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[var(--gradient-hero)]">
-      <nav className="border-b bg-card/50 backdrop-blur-sm">
+      <nav className="border-b backdrop-blur-sm" style={{ background: 'var(--navbar-bg)' }}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h3 className="font-semibold text-lg">Survey Portal</h3>
+          <h3 className="font-semibold text-lg text-white">Survey Portal</h3>
           <Link to="/auth">
-            <Button variant="outline" size="sm">
+            <Button variant="secondary" size="sm">
               Admin Login
             </Button>
           </Link>

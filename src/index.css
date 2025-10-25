@@ -40,8 +40,10 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     --gradient-primary: linear-gradient(135deg, hsl(170 75% 45%), hsl(200 85% 50%));
-    --gradient-hero: linear-gradient(180deg, hsl(170 75% 95%), hsl(200 85% 95%));
+    --gradient-hero: linear-gradient(135deg, hsl(280 60% 95%), hsl(220 70% 95%), hsl(180 60% 95%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(180 100% 98%));
+    --gradient-admin: linear-gradient(145deg, hsl(0 0% 10%), hsl(0 0% 20%), hsl(220 20% 15%));
+    --navbar-bg: hsl(220 60% 20%);
     --shadow-card: 0 4px 16px -4px hsl(170 75% 45% / 0.15);
     --shadow-elevated: 0 8px 24px -6px hsl(170 75% 45% / 0.2);
     --shadow-glow: 0 0 40px hsl(170 75% 60% / 0.3);
@@ -87,8 +89,10 @@ All colors MUST be HSL.
     --ring: 170 75% 50%;
 
     --gradient-primary: linear-gradient(135deg, hsl(170 75% 50%), hsl(200 85% 55%));
-    --gradient-hero: linear-gradient(180deg, hsl(170 30% 15%), hsl(200 30% 15%));
+    --gradient-hero: linear-gradient(135deg, hsl(280 50% 15%), hsl(220 60% 15%), hsl(180 50% 15%));
     --gradient-card: linear-gradient(145deg, hsl(170 20% 15%), hsl(200 20% 18%));
+    --gradient-admin: linear-gradient(145deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(220 30% 12%));
+    --navbar-bg: hsl(220 60% 15%);
     --shadow-card: 0 4px 16px -4px hsl(170 75% 45% / 0.3);
     --shadow-elevated: 0 8px 24px -6px hsl(170 75% 45% / 0.4);
     --shadow-glow: 0 0 40px hsl(170 75% 65% / 0.3);
