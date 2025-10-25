@@ -22,6 +22,8 @@ const Index = () => {
   const [submitted, setSubmitted] = useState(false);
   const [panchayaths, setPanchayaths] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
+  const [totalSubmissions, setTotalSubmissions] = useState(0);
+  const [totalPanchayaths, setTotalPanchayaths] = useState(0);
   
   const [selectedPanchayath, setSelectedPanchayath] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
@@ -34,6 +36,7 @@ const Index = () => {
   useEffect(() => {
     fetchPanchayaths();
     fetchPrograms();
+    fetchStats();
   }, []);
 
   const fetchPanchayaths = async () => {
@@ -51,6 +54,19 @@ const Index = () => {
       `)
       .order("name");
     if (data) setPrograms(data);
+  };
+
+  const fetchStats = async () => {
+    const { count: submissionsCount } = await supabase
+      .from("survey_responses")
+      .select("*", { count: "exact", head: true });
+    
+    const { count: panchayathsCount } = await supabase
+      .from("panchayaths")
+      .select("*", { count: "exact", head: true });
+
+    if (submissionsCount !== null) setTotalSubmissions(submissionsCount);
+    if (panchayathsCount !== null) setTotalPanchayaths(panchayathsCount);
   };
 
   const selectedPanchayathData = panchayaths.find(p => p.id === selectedPanchayath);
@@ -193,8 +209,24 @@ const Index = () => {
           <p className="text-lg text-muted-foreground">
             Help us understand your employment preferences / നിങ്ങളുടെ തൊഴിൽ മുൻഗണനകൾ മനസ്സിലാക്കാൻ ഞങ്ങളെ സഹായിക്കുക
           </p>
+          
+          <div className="flex justify-center gap-4 mt-6 mb-4">
+            <Card className="bg-card/80 backdrop-blur border-primary/20 shadow-glow">
+              <CardContent className="p-4">
+                <p className="text-sm text-muted-foreground mb-1">Total Submissions</p>
+                <p className="text-2xl font-bold text-primary">{totalSubmissions}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/80 backdrop-blur border-accent/20 shadow-glow">
+              <CardContent className="p-4">
+                <p className="text-sm text-muted-foreground mb-1">Panchayaths</p>
+                <p className="text-2xl font-bold text-accent">{totalPanchayaths}</p>
+              </CardContent>
+            </Card>
+          </div>
+
           <Link to="/auth">
-            <Button variant="outline" size="sm" className="mt-4">
+            <Button variant="outline" size="sm" className="mt-2">
               Admin Login
             </Button>
           </Link>
