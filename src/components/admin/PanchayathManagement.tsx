@@ -12,7 +12,8 @@ import { Trash2 } from "lucide-react";
 const PanchayathManagement = () => {
   const { toast } = useToast();
   const [panchayaths, setPanchayaths] = useState<any[]>([]);
-  const [name, setName] = useState("");
+  const [nameEn, setNameEn] = useState("");
+  const [nameMl, setNameMl] = useState("");
   const [district, setDistrict] = useState("Malappuram");
   const [wardCount, setWardCount] = useState("");
 
@@ -21,7 +22,7 @@ const PanchayathManagement = () => {
   }, []);
 
   const fetchPanchayaths = async () => {
-    const { data } = await supabase.from("panchayaths").select("*").order("name");
+    const { data } = await supabase.from("panchayaths").select("*").order("name_en");
     if (data) setPanchayaths(data);
   };
 
@@ -29,8 +30,9 @@ const PanchayathManagement = () => {
     e.preventDefault();
     
     const { error } = await supabase.from("panchayaths").insert([{
-      name,
-      district: district as "Malappuram" | "Kozhikode" | "Palakkad",
+      name_en: nameEn,
+      name_ml: nameMl,
+      district,
       ward_count: parseInt(wardCount),
     }]);
 
@@ -42,7 +44,8 @@ const PanchayathManagement = () => {
       });
     } else {
       toast({ title: "Success", description: "Panchayath added successfully" });
-      setName("");
+      setNameEn("");
+      setNameMl("");
       setWardCount("");
       fetchPanchayaths();
     }
@@ -72,16 +75,27 @@ const PanchayathManagement = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAdd} className="space-y-4">
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="pname">Panchayath Name</Label>
+                <Label htmlFor="pname_en">Panchayath Name (English)</Label>
                 <Input
-                  id="pname"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  id="pname_en"
+                  value={nameEn}
+                  onChange={(e) => setNameEn(e.target.value)}
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="pname_ml">Panchayath Name (Malayalam)</Label>
+                <Input
+                  id="pname_ml"
+                  value={nameMl}
+                  onChange={(e) => setNameMl(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="district">District</Label>
                 <Select value={district} onValueChange={setDistrict}>
@@ -120,7 +134,8 @@ const PanchayathManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>Name (English)</TableHead>
+                <TableHead>Name (Malayalam)</TableHead>
                 <TableHead>District</TableHead>
                 <TableHead>Ward Count</TableHead>
                 <TableHead>Actions</TableHead>
@@ -129,7 +144,8 @@ const PanchayathManagement = () => {
             <TableBody>
               {panchayaths.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell>{p.name}</TableCell>
+                  <TableCell>{p.name_en}</TableCell>
+                  <TableCell>{p.name_ml}</TableCell>
                   <TableCell>{p.district}</TableCell>
                   <TableCell>{p.ward_count}</TableCell>
                   <TableCell>
