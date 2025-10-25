@@ -35,23 +35,26 @@ export type Database = {
       panchayaths: {
         Row: {
           created_at: string | null
-          district: Database["public"]["Enums"]["district_type"]
+          district: string
           id: string
-          name: string
+          name_en: string
+          name_ml: string
           ward_count: number
         }
         Insert: {
           created_at?: string | null
-          district?: Database["public"]["Enums"]["district_type"]
+          district?: string
           id?: string
-          name: string
+          name_en: string
+          name_ml: string
           ward_count: number
         }
         Update: {
           created_at?: string | null
-          district?: Database["public"]["Enums"]["district_type"]
+          district?: string
           id?: string
-          name?: string
+          name_en?: string
+          name_ml?: string
           ward_count?: number
         }
         Relationships: []
