@@ -8,10 +8,12 @@ import PanchayathManagement from "@/components/admin/PanchayathManagement";
 import CategoryManagement from "@/components/admin/CategoryManagement";
 import ProgramManagement from "@/components/admin/ProgramManagement";
 import SurveyResponses from "@/components/admin/SurveyResponses";
+import UserManagement from "@/components/admin/UserManagement";
 
 const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -21,7 +23,18 @@ const Admin = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       navigate("/auth");
+      return;
     }
+
+    // Check if user is super admin
+    const { data: userRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .eq("role", "super_admin")
+      .maybeSingle();
+
+    setIsSuperAdmin(!!userRole);
     setLoading(false);
   };
 
@@ -52,11 +65,14 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="responses" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <TabsTrigger value="responses">Survey Responses</TabsTrigger>
             <TabsTrigger value="panchayaths">Panchayaths</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="programs">Programs</TabsTrigger>
+            {isSuperAdmin && (
+              <TabsTrigger value="users">User Management</TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="responses">
@@ -74,6 +90,12 @@ const Admin = () => {
           <TabsContent value="programs">
             <ProgramManagement />
           </TabsContent>
+
+          {isSuperAdmin && (
+            <TabsContent value="users">
+              <UserManagement />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
