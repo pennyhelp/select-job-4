@@ -300,19 +300,7 @@ const Index = () => {
                                 {p.category?.name} → {p.sub_category?.name}
                               </div>
                             </div>
-                            <div className="flex gap-2 shrink-0">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="default"
-                                onClick={() => {
-                                  setSelectedProgram(p.id);
-                                  setProgramDialogOpen(false);
-                                  setProgramSearch("");
-                                }}
-                              >
-                                താല്പര്യമുണ്ട്
-                              </Button>
+                            <div className="flex flex-col gap-2 shrink-0">
                               {p.description && (
                                 <Button
                                   type="button"
@@ -326,6 +314,18 @@ const Index = () => {
                                   കൂടുതൽ അറിയാൻ
                                 </Button>
                               )}
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="default"
+                                onClick={() => {
+                                  setSelectedProgram(p.id);
+                                  setProgramDialogOpen(false);
+                                  setProgramSearch("");
+                                }}
+                              >
+                                താല്പര്യമുണ്ട്
+                              </Button>
                             </div>
                           </div>
                         ))}
