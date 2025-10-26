@@ -65,7 +65,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="responses" className="space-y-6">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4'}`}>
+          <TabsList className={`grid w-full gap-1 ${isSuperAdmin ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4'}`}>
             <TabsTrigger value="responses">Survey Responses</TabsTrigger>
             <TabsTrigger value="panchayaths">Panchayaths</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
