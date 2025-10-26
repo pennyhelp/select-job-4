@@ -294,34 +294,39 @@ const Index = () => {
                               selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'
                             }`}
                           >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedProgram(p.id);
-                                setProgramDialogOpen(false);
-                                setProgramSearch("");
-                              }}
-                              className="flex-1 text-left hover:opacity-80 transition-opacity"
-                            >
+                            <div className="flex-1">
                               <div className="font-medium">{p.name}</div>
                               <div className="text-sm text-muted-foreground mt-1">
                                 {p.category?.name} → {p.sub_category?.name}
                               </div>
-                            </button>
-                            {p.description && (
+                            </div>
+                            <div className="flex gap-2 shrink-0">
                               <Button
                                 type="button"
                                 size="sm"
-                                variant="secondary"
+                                variant="default"
                                 onClick={() => {
-                                  setSelectedProgramDetail(p);
-                                  setDetailDialogOpen(true);
+                                  setSelectedProgram(p.id);
+                                  setProgramDialogOpen(false);
+                                  setProgramSearch("");
                                 }}
-                                className="shrink-0"
                               >
-                                കൂടുതൽ അറിയാൻ
+                                താല്പര്യമുണ്ട്
                               </Button>
-                            )}
+                              {p.description && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="secondary"
+                                  onClick={() => {
+                                    setSelectedProgramDetail(p);
+                                    setDetailDialogOpen(true);
+                                  }}
+                                >
+                                  കൂടുതൽ അറിയാൻ
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         ))}
                     </div>
