@@ -312,7 +312,7 @@ const Index = () => {
                               <Button
                                 type="button"
                                 size="sm"
-                                variant="ghost"
+                                variant="secondary"
                                 onClick={() => {
                                   setSelectedProgramDetail(p);
                                   setDetailDialogOpen(true);
