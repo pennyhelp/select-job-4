@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ProgramManagement = () => {
   const { toast } = useToast();
@@ -19,6 +20,12 @@ const ProgramManagement = () => {
   const [programDescription, setProgramDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [editingProgram, setEditingProgram] = useState<any>(null);
+  const [editProgramName, setEditProgramName] = useState("");
+  const [editProgramDescription, setEditProgramDescription] = useState("");
+  const [editProgramCategory, setEditProgramCategory] = useState("");
+  const [editProgramSubCategory, setEditProgramSubCategory] = useState("");
+  const [editSubCategories, setEditSubCategories] = useState<any[]>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -30,6 +37,12 @@ const ProgramManagement = () => {
       fetchSubCategories(selectedCategory);
     }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    if (editProgramCategory) {
+      fetchEditSubCategories(editProgramCategory);
+    }
+  }, [editProgramCategory]);
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*").order("name");
@@ -43,6 +56,15 @@ const ProgramManagement = () => {
       .eq("category_id", categoryId)
       .order("name");
     if (data) setSubCategories(data);
+  };
+
+  const fetchEditSubCategories = async (categoryId: string) => {
+    const { data } = await supabase
+      .from("sub_categories")
+      .select("*")
+      .eq("category_id", categoryId)
+      .order("name");
+    if (data) setEditSubCategories(data);
   };
 
   const fetchPrograms = async () => {
@@ -90,6 +112,38 @@ const ProgramManagement = () => {
       });
     } else {
       toast({ title: "Success", description: "Program deleted successfully" });
+      fetchPrograms();
+    }
+  };
+
+  const handleEditProgram = (program: any) => {
+    setEditingProgram(program);
+    setEditProgramName(program.name);
+    setEditProgramDescription(program.description || "");
+    setEditProgramCategory(program.category_id);
+    setEditProgramSubCategory(program.sub_category_id);
+  };
+
+  const handleUpdateProgram = async () => {
+    const { error } = await supabase
+      .from("programs")
+      .update({
+        name: editProgramName,
+        description: editProgramDescription,
+        category_id: editProgramCategory,
+        sub_category_id: editProgramSubCategory,
+      })
+      .eq("id", editingProgram.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Success", description: "Program updated successfully" });
+      setEditingProgram(null);
       fetchPrograms();
     }
   };
@@ -189,13 +243,22 @@ const ProgramManagement = () => {
                   <TableCell>{p.sub_categories?.name}</TableCell>
                   <TableCell>{p.name}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteProgram(p.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditProgram(p)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteProgram(p.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -203,6 +266,81 @@ const ProgramManagement = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!editingProgram} onOpenChange={() => setEditingProgram(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Program</DialogTitle>
+            <DialogDescription>Update program details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-prog-cat">Category</Label>
+                <Select 
+                  value={editProgramCategory} 
+                  onValueChange={(val) => {
+                    setEditProgramCategory(val);
+                    setEditProgramSubCategory("");
+                  }}
+                >
+                  <SelectTrigger id="edit-prog-cat">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-prog-sub">Sub-Category</Label>
+                <Select 
+                  value={editProgramSubCategory} 
+                  onValueChange={setEditProgramSubCategory}
+                  disabled={!editProgramCategory}
+                >
+                  <SelectTrigger id="edit-prog-sub">
+                    <SelectValue placeholder="Select sub-category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    {editSubCategories.map((sc) => (
+                      <SelectItem key={sc.id} value={sc.id}>
+                        {sc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-prog-name">Program Name</Label>
+              <Input
+                id="edit-prog-name"
+                value={editProgramName}
+                onChange={(e) => setEditProgramName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-prog-desc">Description</Label>
+              <Textarea
+                id="edit-prog-desc"
+                value={editProgramDescription}
+                onChange={(e) => setEditProgramDescription(e.target.value)}
+                placeholder="Enter program description..."
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingProgram(null)}>Cancel</Button>
+            <Button onClick={handleUpdateProgram}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
