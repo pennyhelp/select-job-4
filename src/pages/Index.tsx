@@ -319,7 +319,7 @@ const Index = () => {
                                 }}
                                 className="shrink-0"
                               >
-                                <Info className="h-4 w-4" />
+                                കൂടുതൽ അറിയാൻ
                               </Button>
                             )}
                           </div>
