@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +16,7 @@ const ProgramManagement = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [subCategories, setSubCategories] = useState<any[]>([]);
   const [programName, setProgramName] = useState("");
+  const [programDescription, setProgramDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
 
@@ -58,6 +60,7 @@ const ProgramManagement = () => {
       category_id: selectedCategory,
       sub_category_id: selectedSubCategory,
       name: programName,
+      description: programDescription,
     });
 
     if (error) {
@@ -69,6 +72,7 @@ const ProgramManagement = () => {
     } else {
       toast({ title: "Success", description: "Program added successfully" });
       setProgramName("");
+      setProgramDescription("");
       setSelectedCategory("");
       setSelectedSubCategory("");
       fetchPrograms();
@@ -146,6 +150,16 @@ const ProgramManagement = () => {
                   required
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="progdesc">Description (Optional)</Label>
+              <Textarea
+                id="progdesc"
+                value={programDescription}
+                onChange={(e) => setProgramDescription(e.target.value)}
+                placeholder="Enter program description..."
+                className="min-h-[100px]"
+              />
             </div>
             <Button type="submit" disabled={!selectedSubCategory}>
               Add Program

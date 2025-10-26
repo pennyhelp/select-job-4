@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle2, Search } from "lucide-react";
+import { Loader2, CheckCircle2, Search, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 
@@ -35,6 +35,8 @@ const Index = () => {
   const [customProgram, setCustomProgram] = useState("");
   const [programDialogOpen, setProgramDialogOpen] = useState(false);
   const [programSearch, setProgramSearch] = useState("");
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedProgramDetail, setSelectedProgramDetail] = useState<any>(null);
 
   useEffect(() => {
     fetchPanchayaths();
@@ -286,28 +288,62 @@ const Index = () => {
                           p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
                         )
                         .map((p) => (
-                          <button
+                          <div
                             key={p.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedProgram(p.id);
-                              setProgramDialogOpen(false);
-                              setProgramSearch("");
-                            }}
-                            className={`w-full text-left p-4 rounded-lg border-2 transition-all hover:border-primary hover:bg-accent ${
+                            className={`flex items-start gap-2 p-4 rounded-lg border-2 transition-all ${
                               selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'
                             }`}
                           >
-                            <div className="font-medium">{p.name}</div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              {p.category?.name} → {p.sub_category?.name}
-                            </div>
-                          </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedProgram(p.id);
+                                setProgramDialogOpen(false);
+                                setProgramSearch("");
+                              }}
+                              className="flex-1 text-left hover:opacity-80 transition-opacity"
+                            >
+                              <div className="font-medium">{p.name}</div>
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {p.category?.name} → {p.sub_category?.name}
+                              </div>
+                            </button>
+                            {p.description && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSelectedProgramDetail(p);
+                                  setDetailDialogOpen(true);
+                                }}
+                                className="shrink-0"
+                              >
+                                <Info className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         ))}
                     </div>
                   </DialogContent>
                 </Dialog>
               </div>
+
+              <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{selectedProgramDetail?.name}</DialogTitle>
+                    <DialogDescription>
+                      {selectedProgramDetail?.category?.name} → {selectedProgramDetail?.sub_category?.name}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {selectedProgramDetail?.description}
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
