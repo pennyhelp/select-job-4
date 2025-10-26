@@ -248,6 +248,67 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="program" className="text-base">
+                  Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക
+                </Label>
+                <Dialog open={programDialogOpen} onOpenChange={setProgramDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-start text-left border-2 h-auto min-h-10 py-2"
+                    >
+                      {selectedProgram 
+                        ? programs.find(p => p.id === selectedProgram)?.name
+                        : "Select program / പദ്ധതി തിരഞ്ഞെടുക്കുക"
+                      }
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+                    <DialogHeader>
+                      <DialogTitle>Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക</DialogTitle>
+                    </DialogHeader>
+                    <div className="relative mb-4">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search programs... / പദ്ധതികൾ തിരയുക..."
+                        value={programSearch}
+                        onChange={(e) => setProgramSearch(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
+                    <div className="overflow-y-auto flex-1 space-y-2 pr-2">
+                      {programs
+                        .filter(p => 
+                          p.name.toLowerCase().includes(programSearch.toLowerCase()) ||
+                          p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) ||
+                          p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
+                        )
+                        .map((p) => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedProgram(p.id);
+                              setProgramDialogOpen(false);
+                              setProgramSearch("");
+                            }}
+                            className={`w-full text-left p-4 rounded-lg border-2 transition-all hover:border-primary hover:bg-accent ${
+                              selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'
+                            }`}
+                          >
+                            <div className="font-medium">{p.name}</div>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {p.category?.name} → {p.sub_category?.name}
+                            </div>
+                          </button>
+                        ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="panchayath" className="text-base">
@@ -334,67 +395,6 @@ const Index = () => {
                   max="150"
                   className="border-2"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="program" className="text-base">
-                  Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക
-                </Label>
-                <Dialog open={programDialogOpen} onOpenChange={setProgramDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-start text-left border-2 h-auto min-h-10 py-2"
-                    >
-                      {selectedProgram 
-                        ? programs.find(p => p.id === selectedProgram)?.name
-                        : "Select program / പദ്ധതി തിരഞ്ഞെടുക്കുക"
-                      }
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-                    <DialogHeader>
-                      <DialogTitle>Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക</DialogTitle>
-                    </DialogHeader>
-                    <div className="relative mb-4">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search programs... / പദ്ധതികൾ തിരയുക..."
-                        value={programSearch}
-                        onChange={(e) => setProgramSearch(e.target.value)}
-                        className="pl-9"
-                      />
-                    </div>
-                    <div className="overflow-y-auto flex-1 space-y-2 pr-2">
-                      {programs
-                        .filter(p => 
-                          p.name.toLowerCase().includes(programSearch.toLowerCase()) ||
-                          p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) ||
-                          p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
-                        )
-                        .map((p) => (
-                          <button
-                            key={p.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedProgram(p.id);
-                              setProgramDialogOpen(false);
-                              setProgramSearch("");
-                            }}
-                            className={`w-full text-left p-4 rounded-lg border-2 transition-all hover:border-primary hover:bg-accent ${
-                              selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'
-                            }`}
-                          >
-                            <div className="font-medium">{p.name}</div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              {p.category?.name} → {p.sub_category?.name}
-                            </div>
-                          </button>
-                        ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
               </div>
 
               <div className="space-y-2">
