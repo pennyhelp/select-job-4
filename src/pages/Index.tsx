@@ -168,6 +168,7 @@ const Index = () => {
       });
     } else {
       setSubmitted(true);
+      fetchStats(); // Refresh the stats after successful submission
       toast({
         title: "Success!",
         description: "Your survey response has been submitted.",
@@ -215,7 +216,17 @@ const Index = () => {
     <div className="min-h-screen bg-[var(--gradient-hero)]">
       <nav className="border-b backdrop-blur-sm" style={{ background: 'var(--navbar-bg)' }}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h3 className="font-semibold text-lg text-white">Survey Portal</h3>
+          <div className="flex items-center gap-4">
+            <h3 className="font-semibold text-lg text-white">Survey Portal</h3>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => window.location.href = '/'}
+              className="text-white hover:text-white/80"
+            >
+              Home
+            </Button>
+          </div>
           <Link to="/auth">
             <Button variant="secondary" size="sm">
               Admin Login
