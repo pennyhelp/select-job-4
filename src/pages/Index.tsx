@@ -109,10 +109,19 @@ const Index = () => {
       return;
     }
 
-    if (!selectedProgram && !customProgram) {
+    if (!selectedProgram && !customProgram.trim()) {
       toast({
         title: "Error",
         description: "Please select a program or enter your own",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (customProgram.trim().length > 200) {
+      toast({
+        title: "Error",
+        description: "Program name must be less than 200 characters",
         variant: "destructive",
       });
       return;
@@ -148,7 +157,7 @@ const Index = () => {
       category_id: selectedProgramData?.category_id || null,
       sub_category_id: selectedProgramData?.sub_category_id || null,
       program_id: selectedProgram || null,
-      custom_program: customProgram || null,
+      custom_program: customProgram.trim() || null,
     });
 
     if (error) {
@@ -264,6 +273,8 @@ const Index = () => {
                     >
                       {selectedProgram 
                         ? programs.find(p => p.id === selectedProgram)?.name
+                        : customProgram
+                        ? customProgram
                         : "Select program / പദ്ധതി തിരഞ്ഞെടുക്കുക"
                       }
                     </Button>
@@ -289,16 +300,61 @@ const Index = () => {
                         onClick={() => {
                           setSelectedProgram("");
                           setShowCustomProgram(true);
-                          setProgramDialogOpen(false);
                           setProgramSearch("");
                           setTimeout(() => {
-                            document.getElementById("custom")?.focus();
+                            document.getElementById("custom-program-input")?.focus();
                           }, 100);
                         }}
                       >
                         ഇവയിൽ ഒന്നുമല്ലാത്തത് (None of these)
                       </Button>
                     </div>
+                    {showCustomProgram && (
+                      <div className="mb-4 p-4 border-2 border-primary rounded-lg bg-accent/50">
+                        <Label htmlFor="custom-program-input" className="text-base mb-2 block">
+                          Your Own Program / നിങ്ങളുടെ സ്വന്തം പദ്ധതി
+                        </Label>
+                        <Input
+                          id="custom-program-input"
+                          placeholder="Enter your program idea / നിങ്ങളുടെ പദ്ധതി"
+                          value={customProgram}
+                          onChange={(e) => setCustomProgram(e.target.value)}
+                          className="border-2"
+                          maxLength={200}
+                        />
+                        <div className="mt-3 flex gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => {
+                              if (customProgram.trim()) {
+                                setProgramDialogOpen(false);
+                                setProgramSearch("");
+                              } else {
+                                toast({
+                                  title: "Error",
+                                  description: "Please enter a program name",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                          >
+                            സമർപ്പിക്കുക (Submit)
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setShowCustomProgram(false);
+                              setCustomProgram("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                     <div className="overflow-y-auto flex-1 space-y-2 pr-2">
                       {programs
                         .filter(p => 
