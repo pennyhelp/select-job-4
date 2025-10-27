@@ -37,6 +37,7 @@ const Index = () => {
   const [programSearch, setProgramSearch] = useState("");
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedProgramDetail, setSelectedProgramDetail] = useState<any>(null);
+  const [showCustomProgram, setShowCustomProgram] = useState(false);
 
   useEffect(() => {
     fetchPanchayaths();
@@ -287,6 +288,7 @@ const Index = () => {
                         className="w-full border-2 border-dashed"
                         onClick={() => {
                           setSelectedProgram("");
+                          setShowCustomProgram(true);
                           setProgramDialogOpen(false);
                           setProgramSearch("");
                           setTimeout(() => {
@@ -337,6 +339,8 @@ const Index = () => {
                                 variant="default"
                                 onClick={() => {
                                   setSelectedProgram(p.id);
+                                  setShowCustomProgram(false);
+                                  setCustomProgram("");
                                   setProgramDialogOpen(false);
                                   setProgramSearch("");
                                 }}
