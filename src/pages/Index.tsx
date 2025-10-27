@@ -280,6 +280,23 @@ const Index = () => {
                         className="pl-9"
                       />
                     </div>
+                    <div className="mb-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full border-2 border-dashed"
+                        onClick={() => {
+                          setSelectedProgram("");
+                          setProgramDialogOpen(false);
+                          setProgramSearch("");
+                          setTimeout(() => {
+                            document.getElementById("custom")?.focus();
+                          }, 100);
+                        }}
+                      >
+                        ഇവയിൽ ഒന്നുമല്ലാത്തത് (None of these)
+                      </Button>
+                    </div>
                     <div className="overflow-y-auto flex-1 space-y-2 pr-2">
                       {programs
                         .filter(p => 
