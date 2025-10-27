@@ -515,20 +515,6 @@ const Index = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="custom" className="text-base">
-                  Your Own Program (if not listed above) / നിങ്ങളുടെ സ്വന്തം പദ്ധതി
-                </Label>
-                <Input
-                  id="custom"
-                  placeholder="Enter your program idea / നിങ്ങളുടെ പദ്ധതി"
-                  value={customProgram}
-                  onChange={(e) => setCustomProgram(e.target.value)}
-                  maxLength={200}
-                  className="border-2"
-                />
-              </div>
-
               <Button type="submit" className="w-full text-lg py-6 shadow-glow" disabled={loading}>
                 {loading ? (
                   <>
