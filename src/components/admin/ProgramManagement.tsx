@@ -26,6 +26,9 @@ const ProgramManagement = () => {
   const [editProgramCategory, setEditProgramCategory] = useState("");
   const [editProgramSubCategory, setEditProgramSubCategory] = useState("");
   const [editSubCategories, setEditSubCategories] = useState<any[]>([]);
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterSubCategory, setFilterSubCategory] = useState("");
+  const [filterSubCategories, setFilterSubCategories] = useState<any[]>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -43,6 +46,15 @@ const ProgramManagement = () => {
       fetchEditSubCategories(editProgramCategory);
     }
   }, [editProgramCategory]);
+
+  useEffect(() => {
+    if (filterCategory) {
+      fetchFilterSubCategories(filterCategory);
+    } else {
+      setFilterSubCategories([]);
+      setFilterSubCategory("");
+    }
+  }, [filterCategory]);
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("*").order("name");
@@ -65,6 +77,15 @@ const ProgramManagement = () => {
       .eq("category_id", categoryId)
       .order("name");
     if (data) setEditSubCategories(data);
+  };
+
+  const fetchFilterSubCategories = async (categoryId: string) => {
+    const { data } = await supabase
+      .from("sub_categories")
+      .select("*")
+      .eq("category_id", categoryId)
+      .order("name");
+    if (data) setFilterSubCategories(data);
   };
 
   const fetchPrograms = async () => {
@@ -227,6 +248,60 @@ const ProgramManagement = () => {
           <CardTitle>Programs List</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex gap-4 mb-4">
+            <div className="flex-1">
+              <Label htmlFor="filter-cat">Filter by Category</Label>
+              <Select value={filterCategory} onValueChange={(val) => {
+                setFilterCategory(val);
+                setFilterSubCategory("");
+              }}>
+                <SelectTrigger id="filter-cat">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="filter-sub">Filter by Sub-Category</Label>
+              <Select 
+                value={filterSubCategory} 
+                onValueChange={setFilterSubCategory}
+                disabled={!filterCategory || filterCategory === "all"}
+              >
+                <SelectTrigger id="filter-sub">
+                  <SelectValue placeholder="All Sub-Categories" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Sub-Categories</SelectItem>
+                  {filterSubCategories.map((sc) => (
+                    <SelectItem key={sc.id} value={sc.id}>
+                      {sc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {(filterCategory || filterSubCategory) && (
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setFilterCategory("");
+                    setFilterSubCategory("");
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -237,7 +312,13 @@ const ProgramManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {programs.map((p: any) => (
+              {programs
+                .filter((p: any) => {
+                  if (filterCategory && filterCategory !== "all" && p.category_id !== filterCategory) return false;
+                  if (filterSubCategory && filterSubCategory !== "all" && p.sub_category_id !== filterSubCategory) return false;
+                  return true;
+                })
+                .map((p: any) => (
                 <TableRow key={p.id}>
                   <TableCell>{p.categories?.name}</TableCell>
                   <TableCell>{p.sub_categories?.name}</TableCell>
