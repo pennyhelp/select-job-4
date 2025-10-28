@@ -284,12 +284,12 @@ const Index = () => {
                           {category.name}
                         </Button>)}
                     </div>
-                    <div className="relative mb-4">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input placeholder="Search programs... / പദ്ധതികൾ തിരയുക..." value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-9" />
+                    <div className="relative mb-3">
+                      <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input placeholder="Search programs... / പദ്ധതികൾ തിരയുക..." value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-8 h-8 text-sm" />
                     </div>
-                    <div className="mb-4">
-                      <Button type="button" variant="outline" onClick={() => {
+                    <div className="mb-3">
+                      <Button type="button" size="sm" variant="outline" onClick={() => {
                         setSelectedProgram("");
                         setShowCustomProgram(true);
                         setProgramSearch("");
