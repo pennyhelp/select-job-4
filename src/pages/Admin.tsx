@@ -56,10 +56,15 @@ const Admin = () => {
       <header className="border-b shadow-sm" style={{ background: 'var(--navbar-bg)' }}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-          <Button onClick={handleLogout} variant="secondary" size="sm">
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => navigate("/")} variant="ghost" size="sm" className="text-white hover:text-white/80">
+              Home
+            </Button>
+            <Button onClick={handleLogout} variant="secondary" size="sm">
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 

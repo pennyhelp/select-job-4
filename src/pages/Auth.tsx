@@ -106,8 +106,22 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
-      <Card className="w-full max-w-md shadow-elevated">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+      <nav className="border-b backdrop-blur-sm" style={{ background: 'var(--navbar-bg)' }}>
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <h3 className="font-semibold text-lg text-white">Admin Authentication</h3>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/')}
+            className="text-white hover:text-white/80"
+          >
+            Home
+          </Button>
+        </div>
+      </nav>
+      <div className="flex items-center justify-center min-h-[calc(100vh-56px)] p-4">
+        <Card className="w-full max-w-md shadow-elevated">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
           <CardDescription className="text-center">
@@ -181,6 +195,7 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
