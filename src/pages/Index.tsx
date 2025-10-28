@@ -284,11 +284,11 @@ const Index = () => {
                           {category.name}
                         </Button>)}
                     </div>
-                    <div className="relative mb-3">
-                      <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                      <Input placeholder="Search programs... / പദ്ധതികൾ തിരയുക..." value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-8 h-8 text-sm" />
-                    </div>
-                    <div className="mb-3">
+                    <div className="flex gap-2 mb-3">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                        <Input placeholder="Search programs... / പദ്ധതികൾ തിരയുക..." value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-8 h-9 text-sm" />
+                      </div>
                       <Button type="button" size="sm" variant="outline" onClick={() => {
                         setSelectedProgram("");
                         setShowCustomProgram(true);
@@ -296,8 +296,8 @@ const Index = () => {
                         setTimeout(() => {
                           document.getElementById("custom-program-input")?.focus();
                         }, 100);
-                      }} className="w-full border-2 border-dashed text-slate-950 bg-sky-300 hover:bg-sky-200">
-                        ഇവയിൽ ഒന്നുമല്ലാത്തത് (None of these)
+                      }} className="border-2 border-dashed text-slate-950 bg-sky-300 hover:bg-sky-200 whitespace-nowrap shrink-0">
+                        ഇവയിൽ ഒന്നുമല്ലാത്തത്
                       </Button>
                     </div>
                     {showCustomProgram && <div className="mb-4 p-4 border-2 border-primary rounded-lg bg-accent/50">
