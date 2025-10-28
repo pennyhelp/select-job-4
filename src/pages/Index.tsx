@@ -23,6 +23,8 @@ const Index = () => {
   const [submitted, setSubmitted] = useState(false);
   const [panchayaths, setPanchayaths] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [totalPanchayaths, setTotalPanchayaths] = useState(0);
   
@@ -41,6 +43,7 @@ const Index = () => {
 
   useEffect(() => {
     fetchPanchayaths();
+    fetchCategories();
     fetchPrograms();
     fetchStats();
   }, []);
@@ -48,6 +51,14 @@ const Index = () => {
   const fetchPanchayaths = async () => {
     const { data } = await supabase.from("panchayaths").select("*").order("name_en");
     if (data) setPanchayaths(data);
+  };
+
+  const fetchCategories = async () => {
+    const { data } = await supabase.from("categories").select("*").order("name");
+    if (data) {
+      setCategories(data);
+      if (data.length > 0) setSelectedCategory(data[0].id);
+    }
   };
 
   const fetchPrograms = async () => {
@@ -294,6 +305,22 @@ const Index = () => {
                     <DialogHeader>
                       <DialogTitle>Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക</DialogTitle>
                     </DialogHeader>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {categories.map((category) => (
+                        <Button
+                          key={category.id}
+                          type="button"
+                          size="sm"
+                          variant={selectedCategory === category.id ? "default" : "outline"}
+                          onClick={() => {
+                            setSelectedCategory(category.id);
+                            setProgramSearch("");
+                          }}
+                        >
+                          {category.name}
+                        </Button>
+                      ))}
+                    </div>
                     <div className="relative mb-4">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -369,9 +396,10 @@ const Index = () => {
                     <div className="overflow-y-auto flex-1 space-y-2 pr-2">
                       {programs
                         .filter(p => 
-                          p.name.toLowerCase().includes(programSearch.toLowerCase()) ||
+                          p.category_id === selectedCategory &&
+                          (p.name.toLowerCase().includes(programSearch.toLowerCase()) ||
                           p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) ||
-                          p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
+                          p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()))
                         )
                         .map((p) => (
                           <div
