@@ -57,7 +57,6 @@ const Index = () => {
     } = await supabase.from("categories").select("*").order("name");
     if (data) {
       setCategories(data);
-      if (data.length > 0) setSelectedCategory(data[0].id);
     }
   };
   const fetchPrograms = async () => {
@@ -272,6 +271,12 @@ const Index = () => {
                       <DialogTitle>Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക</DialogTitle>
                     </DialogHeader>
                     <div className="flex flex-wrap gap-2 mb-4">
+                      <Button type="button" size="sm" variant={!selectedCategory ? "default" : "outline"} onClick={() => {
+                        setSelectedCategory("");
+                        setProgramSearch("");
+                      }}>
+                        Show All / എല്ലാം കാണിക്കുക
+                      </Button>
                       {categories.map(category => <Button key={category.id} type="button" size="sm" variant={selectedCategory === category.id ? "default" : "outline"} onClick={() => {
                         setSelectedCategory(category.id);
                         setProgramSearch("");
@@ -324,7 +329,7 @@ const Index = () => {
                         </div>
                       </div>}
                     <div className="overflow-y-auto flex-1 space-y-2 pr-2">
-                      {programs.filter(p => p.category_id === selectedCategory && (p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()))).map(p => <div key={p.id} className={`flex items-start gap-2 p-4 rounded-lg border-2 transition-all ${selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'}`}>
+                      {programs.filter(p => (!selectedCategory || p.category_id === selectedCategory) && (p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()))).map(p => <div key={p.id} className={`flex items-start gap-2 p-4 rounded-lg border-2 transition-all ${selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'}`}>
                             <div className="flex-1">
                               <div className="font-medium">{p.name}</div>
                               <div className="text-sm text-muted-foreground mt-1">
