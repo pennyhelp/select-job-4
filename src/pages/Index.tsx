@@ -274,11 +274,116 @@ const Index = () => {
                   <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                       <DialogTitle>Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക</DialogTitle>
-                      <DialogDescription>Choose a category to see available programs</DialogDescription>
+                      <DialogDescription>Choose a category to see available programs or search directly</DialogDescription>
                     </DialogHeader>
                     
                     {!selectedJobCategory ? <div className="overflow-y-auto flex-1 pr-2">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="mb-4">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              type="text" 
+                              placeholder="Search programs directly / പദ്ധതികൾ നേരിട്ട് തിരയുക" 
+                              value={programSearch} 
+                              onChange={e => setProgramSearch(e.target.value)} 
+                              className="pl-10" 
+                            />
+                          </div>
+                        </div>
+
+                        {programSearch ? (
+                          <div>
+                            <div className="mb-3 flex items-center justify-between">
+                              <h3 className="font-semibold">Search Results</h3>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setProgramSearch("")}
+                              >
+                                Clear Search
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {(() => {
+                                const filteredPrograms = programs.filter(p => 
+                                  p.name.toLowerCase().includes(programSearch.toLowerCase()) || 
+                                  p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || 
+                                  p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
+                                );
+                                const categoryCounters: Record<string, number> = {};
+                                
+                                return filteredPrograms.length > 0 ? (
+                                  filteredPrograms.map(p => {
+                                    const categoryName = p.category?.name || '';
+                                    const firstLetter = categoryName.charAt(0).toUpperCase();
+                                    if (!categoryCounters[p.category_id]) {
+                                      categoryCounters[p.category_id] = 100;
+                                    }
+                                    const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
+                                    categoryCounters[p.category_id]++;
+                                    
+                                    return (
+                                      <Card 
+                                        key={p.id} 
+                                        className={`transition-all hover:shadow-md cursor-pointer ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}
+                                      >
+                                        <CardHeader className="pb-3">
+                                          <CardTitle className="text-base">
+                                            <span className="font-bold text-primary">{serialNumber}.</span> {p.name}
+                                          </CardTitle>
+                                          <CardDescription className="text-xs">
+                                            {p.category?.name} → {p.sub_category?.name}
+                                          </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="pt-0">
+                                          <div className="flex gap-2">
+                                            {p.description && (
+                                              <Button 
+                                                type="button" 
+                                                size="sm" 
+                                                variant="secondary" 
+                                                className="flex-1" 
+                                                onClick={() => {
+                                                  setSelectedProgramDetail(p);
+                                                  setDetailDialogOpen(true);
+                                                }}
+                                              >
+                                                <Info className="h-3.5 w-3.5 mr-1" />
+                                                കൂടുതൽ അറിയാൻ
+                                              </Button>
+                                            )}
+                                            <Button 
+                                              type="button" 
+                                              size="sm" 
+                                              variant="default" 
+                                              className="flex-1" 
+                                              onClick={() => {
+                                                setSelectedProgram(p.id);
+                                                setShowCustomProgram(false);
+                                                setCustomProgram("");
+                                                setJobDialogOpen(false);
+                                                setProgramSearch("");
+                                                setSelectedJobCategory("");
+                                              }}
+                                            >
+                                              തിരഞ്ഞെടുക്കുക
+                                            </Button>
+                                          </div>
+                                        </CardContent>
+                                      </Card>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="col-span-2 text-center py-8 text-muted-foreground">
+                                    No programs found matching your search
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary" onClick={() => setSelectedJobCategory("all")}>
                             <CardHeader className="bg-red-100">
                               <CardTitle className="text-lg">All Programs</CardTitle>
@@ -312,7 +417,8 @@ const Index = () => {
                               <p className="text-sm text-muted-foreground">നിങ്ങളുടെ സ്വന്തം പ്രോഗ്രാം എഴുതുക</p>
                             </CardContent>
                           </Card>
-                        </div>
+                          </div>
+                        )}
                       </div> : <div className="overflow-y-auto flex-1">
                         <div className="mb-4 space-y-3">
                           <Button type="button" variant="outline" size="sm" onClick={() => {
