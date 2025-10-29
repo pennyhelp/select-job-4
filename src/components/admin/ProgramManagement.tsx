@@ -348,6 +348,7 @@ const ProgramManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>S.No.</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Sub-Category</TableHead>
                 <TableHead>Program</TableHead>
@@ -363,8 +364,9 @@ const ProgramManagement = () => {
                   if (filterSubCategory && filterSubCategory !== "all" && p.sub_category_id !== filterSubCategory) return false;
                   return true;
                 })
-                .map((p: any) => (
+                .map((p: any, index: number) => (
                 <TableRow key={p.id}>
+                  <TableCell className="font-medium">{index + 1}</TableCell>
                   <TableCell>{p.categories?.name}</TableCell>
                   <TableCell>{p.sub_categories?.name}</TableCell>
                   <TableCell>{p.name}</TableCell>

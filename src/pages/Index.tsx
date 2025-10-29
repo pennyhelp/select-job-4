@@ -384,17 +384,31 @@ const Index = () => {
                           </div>
                         ) : (
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary" onClick={() => setSelectedJobCategory("all")}>
-                            <CardHeader className="bg-red-100">
+                          <Card className="cursor-pointer hover:shadow-lg transition-all border-2 backdrop-blur-md bg-primary/10 hover:bg-primary/20 border-primary/30 hover:border-primary" onClick={() => setSelectedJobCategory("all")}>
+                            <CardHeader>
                               <CardTitle className="text-lg">All Programs</CardTitle>
                               <CardDescription>എല്ലാ പദ്ധതികളും കാണുക</CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <p className="text-sm text-muted-foreground">എല്ലാ പ്രോഗ്രാമുകളും കാണുക </p>
+                              <p className="text-sm text-muted-foreground">എല്ലാ പ്രോഗ്രാമുകളും കാണുക </p>
                             </CardContent>
                           </Card>
                           
-                          {categories.map(category => <Card key={category.id} onClick={() => setSelectedJobCategory(category.id)} className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary bg-violet-50">
+                          {categories.map((category, index) => {
+                            const colorClasses = [
+                              'backdrop-blur-md bg-secondary/10 hover:bg-secondary/20 border-secondary/30 hover:border-secondary',
+                              'backdrop-blur-md bg-accent/10 hover:bg-accent/20 border-accent/30 hover:border-accent',
+                              'backdrop-blur-md bg-primary/10 hover:bg-primary/20 border-primary/30 hover:border-primary',
+                              'backdrop-blur-md bg-destructive/10 hover:bg-destructive/20 border-destructive/30 hover:border-destructive',
+                            ];
+                            const colorClass = colorClasses[index % colorClasses.length];
+                            
+                            return (
+                              <Card 
+                                key={category.id} 
+                                onClick={() => setSelectedJobCategory(category.id)} 
+                                className={`cursor-pointer hover:shadow-lg transition-all border-2 ${colorClass}`}
+                              >
                                 <CardHeader>
                                   <CardTitle className="text-lg">{category.name}</CardTitle>
                                 </CardHeader>
@@ -403,13 +417,15 @@ const Index = () => {
                                     {programs.filter(p => p.category_id === category.id).length} programs
                                   </p>
                                 </CardContent>
-                              </Card>)}
+                              </Card>
+                            );
+                          })}
                           
-                          <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary" onClick={() => {
+                          <Card className="cursor-pointer hover:shadow-lg transition-all border-2 backdrop-blur-md bg-muted/30 hover:bg-muted/50 border-muted-foreground/30 hover:border-muted-foreground" onClick={() => {
                             setCustomProgramDialogOpen(true);
                             setJobDialogOpen(false);
                           }}>
-                            <CardHeader className="bg-teal-100">
+                            <CardHeader>
                               <CardTitle className="text-lg">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
                               <CardDescription>None of these</CardDescription>
                             </CardHeader>
