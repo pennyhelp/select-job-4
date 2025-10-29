@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 const ProgramManagement = () => {
   const { toast } = useToast();
@@ -19,12 +21,14 @@ const ProgramManagement = () => {
   const [programName, setProgramName] = useState("");
   const [programDescription, setProgramDescription] = useState("");
   const [programPriority, setProgramPriority] = useState("0");
+  const [programIsTop, setProgramIsTop] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [editingProgram, setEditingProgram] = useState<any>(null);
   const [editProgramName, setEditProgramName] = useState("");
   const [editProgramDescription, setEditProgramDescription] = useState("");
   const [editProgramPriority, setEditProgramPriority] = useState("0");
+  const [editProgramIsTop, setEditProgramIsTop] = useState(false);
   const [editProgramCategory, setEditProgramCategory] = useState("");
   const [editProgramSubCategory, setEditProgramSubCategory] = useState("");
   const [editSubCategories, setEditSubCategories] = useState<any[]>([]);
@@ -94,6 +98,8 @@ const ProgramManagement = () => {
     const { data } = await supabase
       .from("programs")
       .select("*, categories(name), sub_categories(name)")
+      .order("is_top", { ascending: false })
+      .order("priority", { ascending: false })
       .order("name");
     if (data) setPrograms(data);
   };
@@ -107,6 +113,7 @@ const ProgramManagement = () => {
       name: programName,
       description: programDescription,
       priority: parseInt(programPriority),
+      is_top: programIsTop,
     });
 
     if (error) {
@@ -120,6 +127,7 @@ const ProgramManagement = () => {
       setProgramName("");
       setProgramDescription("");
       setProgramPriority("0");
+      setProgramIsTop(false);
       setSelectedCategory("");
       setSelectedSubCategory("");
       fetchPrograms();
@@ -146,6 +154,7 @@ const ProgramManagement = () => {
     setEditProgramName(program.name);
     setEditProgramDescription(program.description || "");
     setEditProgramPriority(String(program.priority || 0));
+    setEditProgramIsTop(program.is_top || false);
     setEditProgramCategory(program.category_id);
     setEditProgramSubCategory(program.sub_category_id);
   };
@@ -157,6 +166,7 @@ const ProgramManagement = () => {
         name: editProgramName,
         description: editProgramDescription,
         priority: parseInt(editProgramPriority),
+        is_top: editProgramIsTop,
         category_id: editProgramCategory,
         sub_category_id: editProgramSubCategory,
       })
@@ -242,17 +252,32 @@ const ProgramManagement = () => {
                 className="min-h-[100px]"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="progpriority">Priority</Label>
-              <Input
-                id="progpriority"
-                type="number"
-                value={programPriority}
-                onChange={(e) => setProgramPriority(e.target.value)}
-                placeholder="0"
-                min="0"
-              />
-              <p className="text-xs text-muted-foreground">Higher numbers = higher priority</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="progpriority">Priority</Label>
+                <Input
+                  id="progpriority"
+                  type="number"
+                  value={programPriority}
+                  onChange={(e) => setProgramPriority(e.target.value)}
+                  placeholder="0"
+                  min="0"
+                />
+                <p className="text-xs text-muted-foreground">Higher numbers = higher priority</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="progistop">Mark as Top 10</Label>
+                <div className="flex items-center h-10">
+                  <Switch
+                    id="progistop"
+                    checked={programIsTop}
+                    onCheckedChange={setProgramIsTop}
+                  />
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {programIsTop ? "Top 10 Program" : "Regular Program"}
+                  </span>
+                </div>
+              </div>
             </div>
             <Button type="submit" disabled={!selectedSubCategory}>
               Add Program
@@ -326,6 +351,8 @@ const ProgramManagement = () => {
                 <TableHead>Category</TableHead>
                 <TableHead>Sub-Category</TableHead>
                 <TableHead>Program</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Top 10</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -341,6 +368,12 @@ const ProgramManagement = () => {
                   <TableCell>{p.categories?.name}</TableCell>
                   <TableCell>{p.sub_categories?.name}</TableCell>
                   <TableCell>{p.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{p.priority || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {p.is_top && <Badge variant="default">Top 10</Badge>}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -433,16 +466,31 @@ const ProgramManagement = () => {
                 className="min-h-[100px]"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-prog-priority">Priority</Label>
-              <Input
-                id="edit-prog-priority"
-                type="number"
-                value={editProgramPriority}
-                onChange={(e) => setEditProgramPriority(e.target.value)}
-                min="0"
-              />
-              <p className="text-xs text-muted-foreground">Higher numbers = higher priority</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-prog-priority">Priority</Label>
+                <Input
+                  id="edit-prog-priority"
+                  type="number"
+                  value={editProgramPriority}
+                  onChange={(e) => setEditProgramPriority(e.target.value)}
+                  min="0"
+                />
+                <p className="text-xs text-muted-foreground">Higher numbers = higher priority</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-prog-istop">Mark as Top 10</Label>
+                <div className="flex items-center h-10">
+                  <Switch
+                    id="edit-prog-istop"
+                    checked={editProgramIsTop}
+                    onCheckedChange={setEditProgramIsTop}
+                  />
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {editProgramIsTop ? "Top 10 Program" : "Regular Program"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>
