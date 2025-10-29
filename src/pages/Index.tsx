@@ -40,6 +40,7 @@ const Index = () => {
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
   const [selectedJobCategory, setSelectedJobCategory] = useState<string>("");
   const [categorySearch, setCategorySearch] = useState("");
+  const [programSearch, setProgramSearch] = useState("");
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -344,23 +345,46 @@ const Index = () => {
                       </div>
                     ) : (
                       <div className="overflow-y-auto flex-1">
-                        <div className="mb-4">
+                        <div className="mb-4 space-y-3">
                           <Button 
                             type="button" 
                             variant="outline" 
                             size="sm"
-                            onClick={() => setSelectedJobCategory("")}
+                            onClick={() => {
+                              setSelectedJobCategory("");
+                              setProgramSearch("");
+                            }}
                           >
                             ← Back to Categories
                           </Button>
+                          
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input
+                              type="text"
+                              placeholder="Search programs / പദ്ധതികൾ തിരയുക"
+                              value={programSearch}
+                              onChange={(e) => setProgramSearch(e.target.value)}
+                              className="pl-10"
+                            />
+                          </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {(() => {
-                            const filteredPrograms = programs.filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory);
+                            const filteredPrograms = programs
+                              .filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory)
+                              .filter(p => 
+                                programSearch === "" || 
+                                p.name.toLowerCase().includes(programSearch.toLowerCase()) ||
+                                p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) ||
+                                p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
+                              );
                             const categoryCounters: Record<string, number> = {};
                             
-                            return filteredPrograms.map(p => {
+                            return (
+                              <>
+                                {filteredPrograms.map(p => {
                               const categoryName = p.category?.name || '';
                               const firstLetter = categoryName.charAt(0).toUpperCase();
                               
@@ -417,7 +441,30 @@ const Index = () => {
                                  </CardContent>
                                </Card>
                              );
-                           });
+                           })}
+                           
+                           <Card 
+                             className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary"
+                             onClick={() => {
+                               setShowCustomProgram(true);
+                               setSelectedProgram("");
+                               setJobDialogOpen(false);
+                               setSelectedJobCategory("");
+                               setProgramSearch("");
+                             }}
+                           >
+                             <CardHeader className="pb-3">
+                               <CardTitle className="text-base">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
+                               <CardDescription className="text-xs">None of these</CardDescription>
+                             </CardHeader>
+                             <CardContent className="pt-0">
+                               <p className="text-sm text-muted-foreground">
+                                 Enter your own program
+                               </p>
+                             </CardContent>
+                           </Card>
+                         </>
+                       );
                          })()}
                         </div>
                       </div>
@@ -441,6 +488,33 @@ const Index = () => {
                   </div>
                 </DialogContent>
               </Dialog>
+
+              {showCustomProgram && (
+                <div className="space-y-2">
+                  <Label htmlFor="customProgram" className="text-base">
+                    Custom Program / നിങ്ങളുടെ പദ്ധതി *
+                  </Label>
+                  <Input 
+                    id="customProgram" 
+                    value={customProgram} 
+                    onChange={e => setCustomProgram(e.target.value)} 
+                    placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക"
+                    maxLength={200} 
+                    className="border-2" 
+                  />
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setShowCustomProgram(false);
+                      setCustomProgram("");
+                    }}
+                  >
+                    ← Select from programs instead
+                  </Button>
+                </div>
+              )}
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
