@@ -262,12 +262,17 @@ const Index = () => {
                 <Label htmlFor="job" className="text-base">
                   Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക
                 </Label>
-                <Dialog open={jobDialogOpen} onOpenChange={setJobDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" className="w-full justify-start text-left border-2 h-auto min-h-10 py-2">
-                      {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
-                    </Button>
-                  </DialogTrigger>
+                <div className="flex gap-2">
+                  <Dialog open={jobDialogOpen} onOpenChange={setJobDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button type="button" variant="outline" className="flex-1 justify-start text-left border-2 h-auto min-h-10 py-2">
+                        {selectedProgram 
+                          ? programs.find(p => p.id === selectedProgram)?.name 
+                          : showCustomProgram && customProgram 
+                            ? customProgram 
+                            : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                       <DialogTitle>Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക</DialogTitle>
@@ -454,8 +459,24 @@ const Index = () => {
                         </div>
                       </div>
                     )}
-                  </DialogContent>
-                </Dialog>
+                    </DialogContent>
+                  </Dialog>
+                  {(selectedProgram || (showCustomProgram && customProgram)) && (
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedProgram("");
+                        setShowCustomProgram(false);
+                        setCustomProgram("");
+                      }}
+                      className="px-3"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
