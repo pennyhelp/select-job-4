@@ -356,19 +356,33 @@ const Index = () => {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {programs
-                            .filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory)
-                            .map(p => (
-                              <Card 
-                                key={p.id} 
-                                className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}
-                              >
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-base">{p.name}</CardTitle>
-                                  <CardDescription className="text-xs">
-                                    {p.category?.name} → {p.sub_category?.name}
-                                  </CardDescription>
-                                </CardHeader>
+                          {(() => {
+                            const filteredPrograms = programs.filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory);
+                            const categoryCounters: Record<string, number> = {};
+                            
+                            return filteredPrograms.map(p => {
+                              const categoryName = p.category?.name || '';
+                              const firstLetter = categoryName.charAt(0).toUpperCase();
+                              
+                              if (!categoryCounters[p.category_id]) {
+                                categoryCounters[p.category_id] = 100;
+                              }
+                              const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
+                              categoryCounters[p.category_id]++;
+                              
+                              return (
+                                <Card 
+                                  key={p.id} 
+                                  className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}
+                                >
+                                  <CardHeader className="pb-3">
+                                    <CardTitle className="text-base">
+                                      <span className="font-bold text-primary">{serialNumber}.</span> {p.name}
+                                    </CardTitle>
+                                    <CardDescription className="text-xs">
+                                      {p.category?.name} → {p.sub_category?.name}
+                                    </CardDescription>
+                                  </CardHeader>
                                 <CardContent className="pt-0">
                                   <div className="flex gap-2">
                                     {p.description && (
@@ -400,9 +414,11 @@ const Index = () => {
                                       താല്പര്യമുണ്ട്
                                     </Button>
                                   </div>
-                                </CardContent>
-                              </Card>
-                            ))}
+                                 </CardContent>
+                               </Card>
+                             );
+                           });
+                         })()}
                         </div>
                       </div>
                     )}
