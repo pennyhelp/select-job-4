@@ -328,32 +328,53 @@ const Index = () => {
                           </Button>
                         </div>
                       </div>}
-                    <div className="overflow-y-auto flex-1 space-y-2 pr-2">
-                      {programs.filter(p => (!selectedCategory || p.category_id === selectedCategory) && (p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()))).map(p => <div key={p.id} className={`flex items-start gap-2 p-4 rounded-lg border-2 transition-all ${selectedProgram === p.id ? 'border-primary bg-accent' : 'border-border'}`}>
-                            <div className="flex-1">
-                              <div className="font-medium">{p.name}</div>
-                              <div className="text-sm text-muted-foreground mt-1">
+                    <div className="overflow-y-auto flex-1 pr-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {programs.filter(p => (!selectedCategory || p.category_id === selectedCategory) && (p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()))).map(p => (
+                          <Card key={p.id} className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base">{p.name}</CardTitle>
+                              <CardDescription className="text-xs">
                                 {p.category?.name} → {p.sub_category?.name}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="pt-0">
+                              <div className="flex gap-2">
+                                {p.description && (
+                                  <Button 
+                                    type="button" 
+                                    size="sm" 
+                                    variant="secondary" 
+                                    className="flex-1"
+                                    onClick={() => {
+                                      setSelectedProgramDetail(p);
+                                      setDetailDialogOpen(true);
+                                    }}
+                                  >
+                                    <Info className="h-3.5 w-3.5 mr-1" />
+                                    കൂടുതൽ അറിയാൻ
+                                  </Button>
+                                )}
+                                <Button 
+                                  type="button" 
+                                  size="sm" 
+                                  variant="default" 
+                                  className="flex-1"
+                                  onClick={() => {
+                                    setSelectedProgram(p.id);
+                                    setShowCustomProgram(false);
+                                    setCustomProgram("");
+                                    setProgramDialogOpen(false);
+                                    setProgramSearch("");
+                                  }}
+                                >
+                                  താല്പര്യമുണ്ട്
+                                </Button>
                               </div>
-                            </div>
-                            <div className="flex flex-col gap-2 shrink-0">
-                              {p.description && <Button type="button" size="sm" variant="secondary" onClick={() => {
-                            setSelectedProgramDetail(p);
-                            setDetailDialogOpen(true);
-                          }}>
-                                  കൂടുതൽ അറിയാൻ
-                                </Button>}
-                              <Button type="button" size="sm" variant="default" onClick={() => {
-                            setSelectedProgram(p.id);
-                            setShowCustomProgram(false);
-                            setCustomProgram("");
-                            setProgramDialogOpen(false);
-                            setProgramSearch("");
-                          }}>
-                                താല്പര്യമുണ്ട്
-                              </Button>
-                            </div>
-                          </div>)}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
