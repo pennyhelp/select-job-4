@@ -283,9 +283,7 @@ const Index = () => {
                               <CardDescription>എല്ലാ പദ്ധതികളും കാണുക</CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <p className="text-sm text-muted-foreground">
-                                View all available programs
-                              </p>
+                              <p className="text-sm text-muted-foreground">എല്ലാ പ്രോഗ്രാമുകളും കാണുക </p>
                             </CardContent>
                           </Card>
                           
@@ -309,9 +307,7 @@ const Index = () => {
                               <CardDescription>None of these</CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <p className="text-sm text-muted-foreground">
-                                Enter your own program
-                              </p>
+                              <p className="text-sm text-muted-foreground">നിങ്ങളുടെ സ്വന്തം പ്രോഗ്രാം എഴുതുക</p>
                             </CardContent>
                           </Card>
                         </div>
