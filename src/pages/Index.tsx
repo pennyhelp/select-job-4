@@ -39,6 +39,8 @@ const Index = () => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedProgramDetail, setSelectedProgramDetail] = useState<any>(null);
   const [showCustomProgram, setShowCustomProgram] = useState(false);
+  const [jobDialogOpen, setJobDialogOpen] = useState(false);
+  const [selectedJobCategory, setSelectedJobCategory] = useState<string>("");
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -257,8 +259,128 @@ const Index = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
+                <Label htmlFor="job" className="text-base">
+                  Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക
+                </Label>
+                <Dialog open={jobDialogOpen} onOpenChange={setJobDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" className="w-full justify-start text-left border-2 h-auto min-h-10 py-2">
+                      {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+                    <DialogHeader>
+                      <DialogTitle>Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക</DialogTitle>
+                      <DialogDescription>Choose a category to see available programs</DialogDescription>
+                    </DialogHeader>
+                    
+                    {!selectedJobCategory ? (
+                      <div className="overflow-y-auto flex-1 pr-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <Card 
+                            className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
+                            onClick={() => setSelectedJobCategory("all")}
+                          >
+                            <CardHeader>
+                              <CardTitle className="text-lg">All Programs</CardTitle>
+                              <CardDescription>എല്ലാ പദ്ധതികളും കാണുക</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm text-muted-foreground">
+                                View all available programs
+                              </p>
+                            </CardContent>
+                          </Card>
+                          
+                          {categories.map((category) => (
+                            <Card 
+                              key={category.id}
+                              className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
+                              onClick={() => setSelectedJobCategory(category.id)}
+                            >
+                              <CardHeader>
+                                <CardTitle className="text-lg">{category.name}</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-sm text-muted-foreground">
+                                  {programs.filter(p => p.category_id === category.id).length} programs
+                                </p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="overflow-y-auto flex-1">
+                        <div className="mb-4">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setSelectedJobCategory("")}
+                          >
+                            ← Back to Categories
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {programs
+                            .filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory)
+                            .map(p => (
+                              <Card 
+                                key={p.id} 
+                                className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}
+                              >
+                                <CardHeader className="pb-3">
+                                  <CardTitle className="text-base">{p.name}</CardTitle>
+                                  <CardDescription className="text-xs">
+                                    {p.category?.name} → {p.sub_category?.name}
+                                  </CardDescription>
+                                </CardHeader>
+                                <CardContent className="pt-0">
+                                  <div className="flex gap-2">
+                                    {p.description && (
+                                      <Button 
+                                        type="button" 
+                                        size="sm" 
+                                        variant="secondary" 
+                                        className="flex-1"
+                                        onClick={() => {
+                                          setSelectedProgramDetail(p);
+                                          setDetailDialogOpen(true);
+                                        }}
+                                      >
+                                        <Info className="h-3.5 w-3.5 mr-1" />
+                                        കൂടുതൽ അറിയാൻ
+                                      </Button>
+                                    )}
+                                    <Button 
+                                      type="button" 
+                                      size="sm" 
+                                      variant="default" 
+                                      className="flex-1"
+                                      onClick={() => {
+                                        setSelectedProgram(p.id);
+                                        setJobDialogOpen(false);
+                                        setSelectedJobCategory("");
+                                      }}
+                                    >
+                                      താല്പര്യമുണ്ട്
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="program" className="text-base">
-                  Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക
+                  Or Search Program / അല്ലെങ്കിൽ പദ്ധതി തിരയുക
                 </Label>
                 <Dialog open={programDialogOpen} onOpenChange={setProgramDialogOpen}>
                   <DialogTrigger asChild>
