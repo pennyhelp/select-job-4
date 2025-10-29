@@ -18,11 +18,13 @@ const ProgramManagement = () => {
   const [subCategories, setSubCategories] = useState<any[]>([]);
   const [programName, setProgramName] = useState("");
   const [programDescription, setProgramDescription] = useState("");
+  const [programPriority, setProgramPriority] = useState("0");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [editingProgram, setEditingProgram] = useState<any>(null);
   const [editProgramName, setEditProgramName] = useState("");
   const [editProgramDescription, setEditProgramDescription] = useState("");
+  const [editProgramPriority, setEditProgramPriority] = useState("0");
   const [editProgramCategory, setEditProgramCategory] = useState("");
   const [editProgramSubCategory, setEditProgramSubCategory] = useState("");
   const [editSubCategories, setEditSubCategories] = useState<any[]>([]);
@@ -104,6 +106,7 @@ const ProgramManagement = () => {
       sub_category_id: selectedSubCategory,
       name: programName,
       description: programDescription,
+      priority: parseInt(programPriority),
     });
 
     if (error) {
@@ -116,6 +119,7 @@ const ProgramManagement = () => {
       toast({ title: "Success", description: "Program added successfully" });
       setProgramName("");
       setProgramDescription("");
+      setProgramPriority("0");
       setSelectedCategory("");
       setSelectedSubCategory("");
       fetchPrograms();
@@ -141,6 +145,7 @@ const ProgramManagement = () => {
     setEditingProgram(program);
     setEditProgramName(program.name);
     setEditProgramDescription(program.description || "");
+    setEditProgramPriority(String(program.priority || 0));
     setEditProgramCategory(program.category_id);
     setEditProgramSubCategory(program.sub_category_id);
   };
@@ -151,6 +156,7 @@ const ProgramManagement = () => {
       .update({
         name: editProgramName,
         description: editProgramDescription,
+        priority: parseInt(editProgramPriority),
         category_id: editProgramCategory,
         sub_category_id: editProgramSubCategory,
       })
@@ -235,6 +241,18 @@ const ProgramManagement = () => {
                 placeholder="Enter program description..."
                 className="min-h-[100px]"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="progpriority">Priority</Label>
+              <Input
+                id="progpriority"
+                type="number"
+                value={programPriority}
+                onChange={(e) => setProgramPriority(e.target.value)}
+                placeholder="0"
+                min="0"
+              />
+              <p className="text-xs text-muted-foreground">Higher numbers = higher priority</p>
             </div>
             <Button type="submit" disabled={!selectedSubCategory}>
               Add Program
@@ -414,6 +432,17 @@ const ProgramManagement = () => {
                 placeholder="Enter program description..."
                 className="min-h-[100px]"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-prog-priority">Priority</Label>
+              <Input
+                id="edit-prog-priority"
+                type="number"
+                value={editProgramPriority}
+                onChange={(e) => setEditProgramPriority(e.target.value)}
+                min="0"
+              />
+              <p className="text-xs text-muted-foreground">Higher numbers = higher priority</p>
             </div>
           </div>
           <DialogFooter>

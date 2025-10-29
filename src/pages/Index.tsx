@@ -39,6 +39,7 @@ const Index = () => {
   const [showCustomProgram, setShowCustomProgram] = useState(false);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
   const [selectedJobCategory, setSelectedJobCategory] = useState<string>("");
+  const [categorySearch, setCategorySearch] = useState("");
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -274,6 +275,17 @@ const Index = () => {
                     
                     {!selectedJobCategory ? (
                       <div className="overflow-y-auto flex-1 pr-2">
+                        <div className="mb-4">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input
+                              type="text"
+                              value={categorySearch}
+                              onChange={(e) => setCategorySearch(e.target.value)}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <Card 
                             className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
@@ -290,22 +302,44 @@ const Index = () => {
                             </CardContent>
                           </Card>
                           
-                          {categories.map((category) => (
-                            <Card 
-                              key={category.id}
-                              className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
-                              onClick={() => setSelectedJobCategory(category.id)}
-                            >
-                              <CardHeader>
-                                <CardTitle className="text-lg">{category.name}</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <p className="text-sm text-muted-foreground">
-                                  {programs.filter(p => p.category_id === category.id).length} programs
-                                </p>
-                              </CardContent>
-                            </Card>
-                          ))}
+                          {categories
+                            .filter(category => 
+                              category.name.toLowerCase().includes(categorySearch.toLowerCase())
+                            )
+                            .map((category) => (
+                              <Card 
+                                key={category.id}
+                                className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
+                                onClick={() => setSelectedJobCategory(category.id)}
+                              >
+                                <CardHeader>
+                                  <CardTitle className="text-lg">{category.name}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <p className="text-sm text-muted-foreground">
+                                    {programs.filter(p => p.category_id === category.id).length} programs
+                                  </p>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          
+                          <Card 
+                            className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary"
+                            onClick={() => {
+                              setShowCustomProgram(true);
+                              setJobDialogOpen(false);
+                            }}
+                          >
+                            <CardHeader>
+                              <CardTitle className="text-lg">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
+                              <CardDescription>None of these</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm text-muted-foreground">
+                                Enter your own program
+                              </p>
+                            </CardContent>
+                          </Card>
                         </div>
                       </div>
                     ) : (
@@ -399,7 +433,7 @@ const Index = () => {
                   </Label>
                   <Select value={selectedPanchayath} onValueChange={setSelectedPanchayath}>
                     <SelectTrigger id="panchayath" className="border-2">
-                      <SelectValue placeholder="Select panchayath / പഞ്ചായത്ത് തിരഞ്ഞെടുക്കുക" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-50">
                       {panchayaths.map(p => <SelectItem key={p.id} value={p.id}>
@@ -415,7 +449,7 @@ const Index = () => {
                   </Label>
                   <Select value={selectedWard} onValueChange={setSelectedWard} disabled={!selectedPanchayath}>
                     <SelectTrigger id="ward" className="border-2">
-                      <SelectValue placeholder="Select ward / വാർഡ് തിരഞ്ഞെടുക്കുക" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-50">
                       {wardNumbers.map(num => <SelectItem key={num} value={num.toString()}>
@@ -431,14 +465,14 @@ const Index = () => {
                   <Label htmlFor="name" className="text-base">
                     Name / പേര് *
                   </Label>
-                  <Input id="name" placeholder="Enter your name / നിങ്ങളുടെ പേര്" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="border-2" />
+                  <Input id="name" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="border-2" />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="mobile" className="text-base">
                     Mobile Number / മൊബൈൽ നമ്പർ *
                   </Label>
-                  <Input id="mobile" type="tel" placeholder="10-digit / 10 അക്കം" value={mobileNumber} onChange={e => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))} required maxLength={10} className="border-2" />
+                  <Input id="mobile" type="tel" value={mobileNumber} onChange={e => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))} required maxLength={10} className="border-2" />
                 </div>
               </div>
 
@@ -446,7 +480,7 @@ const Index = () => {
                 <Label htmlFor="age" className="text-base">
                   Age / പ്രായം *
                 </Label>
-                <Input id="age" type="number" placeholder="Enter your age / പ്രായം" value={age} onChange={e => setAge(e.target.value)} required min="1" max="150" className="border-2" />
+                <Input id="age" type="number" value={age} onChange={e => setAge(e.target.value)} required min="1" max="150" className="border-2" />
               </div>
 
               <Button type="submit" className="w-full text-lg py-6 shadow-glow" disabled={loading}>
