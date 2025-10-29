@@ -68,7 +68,9 @@ const Index = () => {
         *,
         category:categories(name),
         sub_category:sub_categories(name)
-      `).order("name");
+      `).order("is_top", { ascending: false })
+      .order("priority", { ascending: false })
+      .order("name");
     if (data) setPrograms(data);
   };
   const fetchStats = async () => {
