@@ -39,8 +39,8 @@ const Index = () => {
   const [showCustomProgram, setShowCustomProgram] = useState(false);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
   const [selectedJobCategory, setSelectedJobCategory] = useState<string>("");
-  const [categorySearch, setCategorySearch] = useState("");
   const [programSearch, setProgramSearch] = useState("");
+  const [customProgramDialogOpen, setCustomProgramDialogOpen] = useState(false);
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -276,17 +276,6 @@ const Index = () => {
                     
                     {!selectedJobCategory ? (
                       <div className="overflow-y-auto flex-1 pr-2">
-                        <div className="mb-4">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                            <Input
-                              type="text"
-                              value={categorySearch}
-                              onChange={(e) => setCategorySearch(e.target.value)}
-                              className="pl-10"
-                            />
-                          </div>
-                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <Card 
                             className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
@@ -303,11 +292,7 @@ const Index = () => {
                             </CardContent>
                           </Card>
                           
-                          {categories
-                            .filter(category => 
-                              category.name.toLowerCase().includes(categorySearch.toLowerCase())
-                            )
-                            .map((category) => (
+                          {categories.map((category) => (
                               <Card 
                                 key={category.id}
                                 className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
@@ -327,7 +312,7 @@ const Index = () => {
                           <Card 
                             className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary"
                             onClick={() => {
-                              setShowCustomProgram(true);
+                              setCustomProgramDialogOpen(true);
                               setJobDialogOpen(false);
                             }}
                           >
@@ -446,7 +431,7 @@ const Index = () => {
                            <Card 
                              className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary"
                              onClick={() => {
-                               setShowCustomProgram(true);
+                               setCustomProgramDialogOpen(true);
                                setSelectedProgram("");
                                setJobDialogOpen(false);
                                setSelectedJobCategory("");
@@ -489,32 +474,47 @@ const Index = () => {
                 </DialogContent>
               </Dialog>
 
-              {showCustomProgram && (
-                <div className="space-y-2">
-                  <Label htmlFor="customProgram" className="text-base">
-                    Custom Program / നിങ്ങളുടെ പദ്ധതി *
-                  </Label>
-                  <Input 
-                    id="customProgram" 
-                    value={customProgram} 
-                    onChange={e => setCustomProgram(e.target.value)} 
-                    placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക"
-                    maxLength={200} 
-                    className="border-2" 
-                  />
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => {
-                      setShowCustomProgram(false);
-                      setCustomProgram("");
-                    }}
-                  >
-                    ← Select from programs instead
-                  </Button>
-                </div>
-              )}
+              <Dialog open={customProgramDialogOpen} onOpenChange={setCustomProgramDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Enter Custom Program</DialogTitle>
+                    <DialogDescription>നിങ്ങളുടെ പദ്ധതി എഴുതുക</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="customProgramInput" className="text-base">
+                        Program Name / പദ്ധതിയുടെ പേര് *
+                      </Label>
+                      <Input 
+                        id="customProgramInput" 
+                        value={customProgram} 
+                        onChange={e => setCustomProgram(e.target.value)} 
+                        placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക"
+                        maxLength={200} 
+                        className="border-2" 
+                      />
+                    </div>
+                    <Button 
+                      type="button" 
+                      className="w-full"
+                      onClick={() => {
+                        if (customProgram.trim()) {
+                          setShowCustomProgram(true);
+                          setCustomProgramDialogOpen(false);
+                        } else {
+                          toast({
+                            title: "Error",
+                            description: "Please enter a program name",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                    >
+                      Save Program / പദ്ധതി സംരക്ഷിക്കുക
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
