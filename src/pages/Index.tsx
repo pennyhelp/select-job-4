@@ -266,11 +266,7 @@ const Index = () => {
                   <Dialog open={jobDialogOpen} onOpenChange={setJobDialogOpen}>
                     <DialogTrigger asChild>
                       <Button type="button" variant="outline" className="flex-1 justify-start text-left border-2 h-auto min-h-10 py-2">
-                        {selectedProgram 
-                          ? programs.find(p => p.id === selectedProgram)?.name 
-                          : showCustomProgram && customProgram 
-                            ? customProgram 
-                            : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
+                        {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : showCustomProgram && customProgram ? customProgram : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
                       </Button>
                     </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
@@ -279,14 +275,10 @@ const Index = () => {
                       <DialogDescription>Choose a category to see available programs</DialogDescription>
                     </DialogHeader>
                     
-                    {!selectedJobCategory ? (
-                      <div className="overflow-y-auto flex-1 pr-2">
+                    {!selectedJobCategory ? <div className="overflow-y-auto flex-1 pr-2">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Card 
-                            className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
-                            onClick={() => setSelectedJobCategory("all")}
-                          >
-                            <CardHeader>
+                          <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary" onClick={() => setSelectedJobCategory("all")}>
+                            <CardHeader className="bg-red-100">
                               <CardTitle className="text-lg">All Programs</CardTitle>
                               <CardDescription>എല്ലാ പദ്ധതികളും കാണുക</CardDescription>
                             </CardHeader>
@@ -297,12 +289,7 @@ const Index = () => {
                             </CardContent>
                           </Card>
                           
-                          {categories.map((category) => (
-                              <Card 
-                                key={category.id}
-                                className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary"
-                                onClick={() => setSelectedJobCategory(category.id)}
-                              >
+                          {categories.map(category => <Card key={category.id} onClick={() => setSelectedJobCategory(category.id)} className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary bg-violet-50">
                                 <CardHeader>
                                   <CardTitle className="text-lg">{category.name}</CardTitle>
                                 </CardHeader>
@@ -311,17 +298,13 @@ const Index = () => {
                                     {programs.filter(p => p.category_id === category.id).length} programs
                                   </p>
                                 </CardContent>
-                              </Card>
-                            ))}
+                              </Card>)}
                           
-                          <Card 
-                            className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary"
-                            onClick={() => {
-                              setCustomProgramDialogOpen(true);
-                              setJobDialogOpen(false);
-                            }}
-                          >
-                            <CardHeader>
+                          <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary" onClick={() => {
+                            setCustomProgramDialogOpen(true);
+                            setJobDialogOpen(false);
+                          }}>
+                            <CardHeader className="bg-teal-100">
                               <CardTitle className="text-lg">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
                               <CardDescription>None of these</CardDescription>
                             </CardHeader>
@@ -332,63 +315,35 @@ const Index = () => {
                             </CardContent>
                           </Card>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="overflow-y-auto flex-1">
+                      </div> : <div className="overflow-y-auto flex-1">
                         <div className="mb-4 space-y-3">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              setSelectedJobCategory("");
-                              setProgramSearch("");
-                            }}
-                          >
+                          <Button type="button" variant="outline" size="sm" onClick={() => {
+                            setSelectedJobCategory("");
+                            setProgramSearch("");
+                          }}>
                             ← Back to Categories
                           </Button>
                           
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                            <Input
-                              type="text"
-                              placeholder="Search programs / പദ്ധതികൾ തിരയുക"
-                              value={programSearch}
-                              onChange={(e) => setProgramSearch(e.target.value)}
-                              className="pl-10"
-                            />
+                            <Input type="text" placeholder="Search programs / പദ്ധതികൾ തിരയുക" value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-10" />
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {(() => {
-                            const filteredPrograms = programs
-                              .filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory)
-                              .filter(p => 
-                                programSearch === "" || 
-                                p.name.toLowerCase().includes(programSearch.toLowerCase()) ||
-                                p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) ||
-                                p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
-                              );
+                            const filteredPrograms = programs.filter(p => selectedJobCategory === "all" || p.category_id === selectedJobCategory).filter(p => programSearch === "" || p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()));
                             const categoryCounters: Record<string, number> = {};
-                            
-                            return (
-                              <>
+                            return <>
                                 {filteredPrograms.map(p => {
-                              const categoryName = p.category?.name || '';
-                              const firstLetter = categoryName.charAt(0).toUpperCase();
-                              
-                              if (!categoryCounters[p.category_id]) {
-                                categoryCounters[p.category_id] = 100;
-                              }
-                              const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
-                              categoryCounters[p.category_id]++;
-                              
-                              return (
-                                <Card 
-                                  key={p.id} 
-                                  className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}
-                                >
+                                const categoryName = p.category?.name || '';
+                                const firstLetter = categoryName.charAt(0).toUpperCase();
+                                if (!categoryCounters[p.category_id]) {
+                                  categoryCounters[p.category_id] = 100;
+                                }
+                                const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
+                                categoryCounters[p.category_id]++;
+                                return <Card key={p.id} className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}>
                                   <CardHeader className="pb-3">
                                     <CardTitle className="text-base">
                                       <span className="font-bold text-primary">{serialNumber}.</span> {p.name}
@@ -399,50 +354,32 @@ const Index = () => {
                                   </CardHeader>
                                 <CardContent className="pt-0">
                                   <div className="flex gap-2">
-                                    {p.description && (
-                                      <Button 
-                                        type="button" 
-                                        size="sm" 
-                                        variant="secondary" 
-                                        className="flex-1"
-                                        onClick={() => {
-                                          setSelectedProgramDetail(p);
-                                          setDetailDialogOpen(true);
-                                        }}
-                                      >
+                                    {p.description && <Button type="button" size="sm" variant="secondary" className="flex-1" onClick={() => {
+                                        setSelectedProgramDetail(p);
+                                        setDetailDialogOpen(true);
+                                      }}>
                                         <Info className="h-3.5 w-3.5 mr-1" />
                                         കൂടുതൽ അറിയാൻ
-                                      </Button>
-                                    )}
-                                    <Button 
-                                      type="button" 
-                                      size="sm" 
-                                      variant="default" 
-                                      className="flex-1"
-                                      onClick={() => {
+                                      </Button>}
+                                    <Button type="button" size="sm" variant="default" className="flex-1" onClick={() => {
                                         setSelectedProgram(p.id);
                                         setJobDialogOpen(false);
                                         setSelectedJobCategory("");
-                                      }}
-                                    >
+                                      }}>
                                       താല്പര്യമുണ്ട്
                                     </Button>
                                   </div>
                                  </CardContent>
-                               </Card>
-                             );
-                           })}
+                               </Card>;
+                              })}
                            
-                           <Card 
-                             className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary"
-                             onClick={() => {
-                               setCustomProgramDialogOpen(true);
-                               setSelectedProgram("");
-                               setJobDialogOpen(false);
-                               setSelectedJobCategory("");
-                               setProgramSearch("");
-                             }}
-                           >
+                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary" onClick={() => {
+                                setCustomProgramDialogOpen(true);
+                                setSelectedProgram("");
+                                setJobDialogOpen(false);
+                                setSelectedJobCategory("");
+                                setProgramSearch("");
+                              }}>
                              <CardHeader className="pb-3">
                                <CardTitle className="text-base">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
                                <CardDescription className="text-xs">None of these</CardDescription>
@@ -453,29 +390,19 @@ const Index = () => {
                                </p>
                              </CardContent>
                            </Card>
-                         </>
-                       );
-                         })()}
+                         </>;
+                          })()}
                         </div>
-                      </div>
-                    )}
+                      </div>}
                     </DialogContent>
                   </Dialog>
-                  {(selectedProgram || (showCustomProgram && customProgram)) && (
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => {
-                        setSelectedProgram("");
-                        setShowCustomProgram(false);
-                        setCustomProgram("");
-                      }}
-                      className="px-3"
-                    >
+                  {(selectedProgram || showCustomProgram && customProgram) && <Button type="button" variant="ghost" size="sm" onClick={() => {
+                    setSelectedProgram("");
+                    setShowCustomProgram(false);
+                    setCustomProgram("");
+                  }} className="px-3">
                       Clear
-                    </Button>
-                  )}
+                    </Button>}
                 </div>
               </div>
 
@@ -506,31 +433,20 @@ const Index = () => {
                       <Label htmlFor="customProgramInput" className="text-base">
                         Program Name / പദ്ധതിയുടെ പേര് *
                       </Label>
-                      <Input 
-                        id="customProgramInput" 
-                        value={customProgram} 
-                        onChange={e => setCustomProgram(e.target.value)} 
-                        placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക"
-                        maxLength={200} 
-                        className="border-2" 
-                      />
+                      <Input id="customProgramInput" value={customProgram} onChange={e => setCustomProgram(e.target.value)} placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക" maxLength={200} className="border-2" />
                     </div>
-                    <Button 
-                      type="button" 
-                      className="w-full"
-                      onClick={() => {
-                        if (customProgram.trim()) {
-                          setShowCustomProgram(true);
-                          setCustomProgramDialogOpen(false);
-                        } else {
-                          toast({
-                            title: "Error",
-                            description: "Please enter a program name",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
-                    >
+                    <Button type="button" className="w-full" onClick={() => {
+                      if (customProgram.trim()) {
+                        setShowCustomProgram(true);
+                        setCustomProgramDialogOpen(false);
+                      } else {
+                        toast({
+                          title: "Error",
+                          description: "Please enter a program name",
+                          variant: "destructive"
+                        });
+                      }
+                    }}>
                       Save Program / പദ്ധതി സംരക്ഷിക്കുക
                     </Button>
                   </div>
