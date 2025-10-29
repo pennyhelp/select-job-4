@@ -34,8 +34,6 @@ const Index = () => {
   const [age, setAge] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [customProgram, setCustomProgram] = useState("");
-  const [programDialogOpen, setProgramDialogOpen] = useState(false);
-  const [programSearch, setProgramSearch] = useState("");
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedProgramDetail, setSelectedProgramDetail] = useState<any>(null);
   const [showCustomProgram, setShowCustomProgram] = useState(false);
@@ -374,130 +372,6 @@ const Index = () => {
                         </div>
                       </div>
                     )}
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="program" className="text-base">
-                  Or Search Program / അല്ലെങ്കിൽ പദ്ധതി തിരയുക
-                </Label>
-                <Dialog open={programDialogOpen} onOpenChange={setProgramDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" className="w-full justify-start text-left border-2 h-auto min-h-10 py-2">
-                      {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : customProgram ? customProgram : "Select program / പദ്ധതി തിരഞ്ഞെടുക്കുക"}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-                    <DialogHeader>
-                      <DialogTitle>Select Program / പദ്ധതി തിരഞ്ഞെടുക്കുക</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <Button type="button" size="sm" variant={!selectedCategory ? "default" : "outline"} onClick={() => {
-                        setSelectedCategory("");
-                        setProgramSearch("");
-                      }}>
-                        Show All / എല്ലാം കാണിക്കുക
-                      </Button>
-                      {categories.map(category => <Button key={category.id} type="button" size="sm" variant={selectedCategory === category.id ? "default" : "outline"} onClick={() => {
-                        setSelectedCategory(category.id);
-                        setProgramSearch("");
-                      }}>
-                          {category.name}
-                        </Button>)}
-                    </div>
-                    <div className="flex gap-2 mb-3">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                        <Input placeholder="Search programs... / പദ്ധതികൾ തിരയുക..." value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-8 h-9 text-sm" />
-                      </div>
-                      <Button type="button" size="sm" variant="outline" onClick={() => {
-                        setSelectedProgram("");
-                        setShowCustomProgram(true);
-                        setProgramSearch("");
-                        setTimeout(() => {
-                          document.getElementById("custom-program-input")?.focus();
-                        }, 100);
-                      }} className="border-2 border-dashed text-slate-950 bg-sky-300 hover:bg-sky-200 whitespace-nowrap shrink-0">
-                        ഇവയിൽ ഒന്നുമല്ലാത്തത്
-                      </Button>
-                    </div>
-                    {showCustomProgram && <div className="mb-4 p-4 border-2 border-primary rounded-lg bg-accent/50">
-                        <Label htmlFor="custom-program-input" className="text-base mb-2 block">
-                          Your Own Program / നിങ്ങളുടെ സ്വന്തം പദ്ധതി
-                        </Label>
-                        <Input id="custom-program-input" placeholder="Enter your program idea / നിങ്ങളുടെ പദ്ധതി" value={customProgram} onChange={e => setCustomProgram(e.target.value)} className="border-2" maxLength={200} />
-                        <div className="mt-3 flex gap-2">
-                          <Button type="button" size="sm" onClick={() => {
-                          if (customProgram.trim()) {
-                            setProgramDialogOpen(false);
-                            setProgramSearch("");
-                          } else {
-                            toast({
-                              title: "Error",
-                              description: "Please enter a program name",
-                              variant: "destructive"
-                            });
-                          }
-                        }}>
-                            സമർപ്പിക്കുക (Submit)
-                          </Button>
-                          <Button type="button" size="sm" variant="outline" onClick={() => {
-                          setShowCustomProgram(false);
-                          setCustomProgram("");
-                        }}>
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>}
-                    <div className="overflow-y-auto flex-1 pr-2">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {programs.filter(p => (!selectedCategory || p.category_id === selectedCategory) && (p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()))).map(p => (
-                          <Card key={p.id} className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">{p.name}</CardTitle>
-                              <CardDescription className="text-xs">
-                                {p.category?.name} → {p.sub_category?.name}
-                              </CardDescription>
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                              <div className="flex gap-2">
-                                {p.description && (
-                                  <Button 
-                                    type="button" 
-                                    size="sm" 
-                                    variant="secondary" 
-                                    className="flex-1"
-                                    onClick={() => {
-                                      setSelectedProgramDetail(p);
-                                      setDetailDialogOpen(true);
-                                    }}
-                                  >
-                                    <Info className="h-3.5 w-3.5 mr-1" />
-                                    കൂടുതൽ അറിയാൻ
-                                  </Button>
-                                )}
-                                <Button 
-                                  type="button" 
-                                  size="sm" 
-                                  variant="default" 
-                                  className="flex-1"
-                                  onClick={() => {
-                                    setSelectedProgram(p.id);
-                                    setShowCustomProgram(false);
-                                    setCustomProgram("");
-                                    setProgramDialogOpen(false);
-                                    setProgramSearch("");
-                                  }}
-                                >
-                                  താല്പര്യമുണ്ട്
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
