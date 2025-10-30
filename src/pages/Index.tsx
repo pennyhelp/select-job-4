@@ -51,16 +51,33 @@ const Index = () => {
     fetchStats();
   }, []);
 
+  // Reset viewTracked when panchayath or ward changes
+  useEffect(() => {
+    setViewTracked(false);
+  }, [selectedPanchayath, selectedWard]);
+
   // Track view when job dialog opens
   useEffect(() => {
     const trackView = async () => {
       if (jobDialogOpen && selectedPanchayath && selectedWard && !viewTracked) {
         try {
-          await supabase.from("panchayath_views" as any).insert({
+          console.log("Tracking view for:", { selectedPanchayath, selectedWard });
+          const { data, error } = await supabase.from("panchayath_views" as any).insert({
             panchayath_id: selectedPanchayath,
             ward_number: parseInt(selectedWard),
           });
-          setViewTracked(true);
+          
+          if (error) {
+            console.error("Error tracking view:", error);
+            toast({
+              title: "Error tracking view",
+              description: error.message,
+              variant: "destructive",
+            });
+          } else {
+            console.log("View tracked successfully:", data);
+            setViewTracked(true);
+          }
         } catch (error) {
           console.error("Error tracking view:", error);
         }
