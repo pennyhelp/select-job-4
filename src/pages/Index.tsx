@@ -299,7 +299,7 @@ const Index = () => {
 
         <Card className="shadow-elevated bg-[var(--gradient-card)] border-2">
           <CardHeader>
-            <CardTitle className="text-2xl">Survey Form / സർവേ ഫോം</CardTitle>
+            <CardTitle className="text-2xl text-center">Survey Form / സർവേ ഫോം</CardTitle>
             <CardDescription>Please fill in all the required information / ആവശ്യമായ എല്ലാ വിവരങ്ങളും പൂരിപ്പിക്കുക</CardDescription>
           </CardHeader>
           <CardContent>
