@@ -9,6 +9,7 @@ import CategoryManagement from "@/components/admin/CategoryManagement";
 import ProgramManagement from "@/components/admin/ProgramManagement";
 import SurveyResponses from "@/components/admin/SurveyResponses";
 import UserManagement from "@/components/admin/UserManagement";
+import LeadsManagement from "@/components/admin/LeadsManagement";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -70,8 +71,9 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="responses" className="space-y-6">
-          <TabsList className={`grid w-full gap-1 ${isSuperAdmin ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4'}`}>
+          <TabsList className={`grid w-full gap-1 ${isSuperAdmin ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-6' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'}`}>
             <TabsTrigger value="responses">Survey Responses</TabsTrigger>
+            <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="panchayaths">Panchayaths</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="programs">Programs</TabsTrigger>
@@ -82,6 +84,10 @@ const Admin = () => {
 
           <TabsContent value="responses">
             <SurveyResponses />
+          </TabsContent>
+
+          <TabsContent value="leads">
+            <LeadsManagement />
           </TabsContent>
 
           <TabsContent value="panchayaths">
