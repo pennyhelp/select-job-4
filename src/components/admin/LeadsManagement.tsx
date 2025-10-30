@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
 
 interface Panchayath {
   id: string;
@@ -14,12 +15,20 @@ interface Panchayath {
   ward_count: number;
 }
 
+interface WardDetail {
+  ward_number: number;
+  views: number;
+  submissions: number;
+}
+
 interface PanchayathLead {
   panchayath_id: string;
   panchayath_name_en: string;
   panchayath_name_ml: string;
+  ward_count: number;
   total_submissions: number;
   total_views: number;
+  ward_details: WardDetail[];
 }
 
 const LeadsManagement = () => {
@@ -27,7 +36,18 @@ const LeadsManagement = () => {
   const [leads, setLeads] = useState<PanchayathLead[]>([]);
   const [selectedPanchayath, setSelectedPanchayath] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  const toggleRow = (id: string) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id);
+    } else {
+      newExpanded.add(id);
+    }
+    setExpandedRows(newExpanded);
+  };
 
   useEffect(() => {
     fetchPanchayaths();
@@ -61,65 +81,58 @@ const LeadsManagement = () => {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      // Fetch submissions
+      // Fetch submissions with ward info
       const { data: responses, error: responsesError } = await supabase
         .from("survey_responses")
-        .select(`
-          panchayath_id,
-          panchayaths (
-            name_en,
-            name_ml
-          )
-        `);
+        .select("panchayath_id, ward_number");
 
       if (responsesError) throw responsesError;
 
-      // Fetch views
+      // Fetch views with ward info
       const { data: views, error: viewsError } = await supabase
         .from("panchayath_views" as any)
-        .select(`
-          panchayath_id,
-          panchayaths (
-            name_en,
-            name_ml
-          )
-        `);
+        .select("panchayath_id, ward_number");
 
       if (viewsError) throw viewsError;
 
-      // Count submissions per panchayath
-      const leadCounts: Record<string, PanchayathLead> = {};
+      // Group by panchayath and ward
+      const submissionsByPanchayathWard: Record<string, number> = {};
+      const viewsByPanchayathWard: Record<string, number> = {};
 
       responses?.forEach((response: any) => {
-        const panchayathId = response.panchayath_id;
-        if (!leadCounts[panchayathId]) {
-          leadCounts[panchayathId] = {
-            panchayath_id: panchayathId,
-            panchayath_name_en: response.panchayaths?.name_en || "Unknown",
-            panchayath_name_ml: response.panchayaths?.name_ml || "അറിയില്ല",
-            total_submissions: 0,
-            total_views: 0,
-          };
-        }
-        leadCounts[panchayathId].total_submissions += 1;
+        const key = `${response.panchayath_id}-${response.ward_number}`;
+        submissionsByPanchayathWard[key] = (submissionsByPanchayathWard[key] || 0) + 1;
       });
 
-      // Count views per panchayath
       views?.forEach((view: any) => {
-        const panchayathId = view.panchayath_id;
-        if (!leadCounts[panchayathId]) {
-          leadCounts[panchayathId] = {
-            panchayath_id: panchayathId,
-            panchayath_name_en: view.panchayaths?.name_en || "Unknown",
-            panchayath_name_ml: view.panchayaths?.name_ml || "അറിയില്ല",
-            total_submissions: 0,
-            total_views: 0,
-          };
-        }
-        leadCounts[panchayathId].total_views += 1;
+        const key = `${view.panchayath_id}-${view.ward_number}`;
+        viewsByPanchayathWard[key] = (viewsByPanchayathWard[key] || 0) + 1;
       });
 
-      setLeads(Object.values(leadCounts));
+      // Build leads with ward details
+      const leadsData: PanchayathLead[] = panchayaths.map((p) => {
+        const wardDetails: WardDetail[] = [];
+        for (let ward = 1; ward <= p.ward_count; ward++) {
+          const key = `${p.id}-${ward}`;
+          wardDetails.push({
+            ward_number: ward,
+            views: viewsByPanchayathWard[key] || 0,
+            submissions: submissionsByPanchayathWard[key] || 0,
+          });
+        }
+
+        return {
+          panchayath_id: p.id,
+          panchayath_name_en: p.name_en,
+          panchayath_name_ml: p.name_ml,
+          ward_count: p.ward_count,
+          total_submissions: wardDetails.reduce((sum, w) => sum + w.submissions, 0),
+          total_views: wardDetails.reduce((sum, w) => sum + w.views, 0),
+          ward_details: wardDetails,
+        };
+      });
+
+      setLeads(leadsData);
     } catch (error: any) {
       toast({
         title: "Error fetching leads",
@@ -202,12 +215,48 @@ const LeadsManagement = () => {
                     filteredLeads
                       .sort((a, b) => b.total_views - a.total_views)
                       .map((lead) => (
-                        <TableRow key={lead.panchayath_id}>
-                          <TableCell className="font-medium">{lead.panchayath_name_en}</TableCell>
-                          <TableCell>{lead.panchayath_name_ml}</TableCell>
-                          <TableCell className="text-right font-bold text-blue-600">{lead.total_views}</TableCell>
-                          <TableCell className="text-right font-bold text-green-600">{lead.total_submissions}</TableCell>
-                        </TableRow>
+                        <>
+                          <TableRow 
+                            key={lead.panchayath_id}
+                            className="cursor-pointer hover:bg-muted/50"
+                            onClick={() => toggleRow(lead.panchayath_id)}
+                          >
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-2">
+                                {expandedRows.has(lead.panchayath_id) ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4" />
+                                )}
+                                {lead.panchayath_name_en}
+                              </div>
+                            </TableCell>
+                            <TableCell>{lead.panchayath_name_ml}</TableCell>
+                            <TableCell className="text-right font-bold text-blue-600">{lead.total_views}</TableCell>
+                            <TableCell className="text-right font-bold text-green-600">{lead.total_submissions}</TableCell>
+                          </TableRow>
+                          {expandedRows.has(lead.panchayath_id) && (
+                            <TableRow key={`${lead.panchayath_id}-details`}>
+                              <TableCell colSpan={4} className="bg-muted/30 p-4">
+                                <div className="space-y-2">
+                                  <h4 className="font-semibold text-sm mb-3">Ward-wise Details:</h4>
+                                  <div className="grid grid-cols-4 gap-3">
+                                    {lead.ward_details.map((ward) => (
+                                      <div 
+                                        key={ward.ward_number} 
+                                        className="border rounded-lg p-3 bg-background shadow-sm"
+                                      >
+                                        <div className="font-semibold text-sm mb-1">Ward {ward.ward_number}</div>
+                                        <div className="text-xs text-blue-600">Views: {ward.views}</div>
+                                        <div className="text-xs text-green-600">Submissions: {ward.submissions}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </>
                       ))
                   )}
                 </TableBody>
