@@ -81,17 +81,19 @@ const LeadsManagement = () => {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      // Fetch submissions with ward info
+      // Fetch submissions with ward info (with cache busting)
       const { data: responses, error: responsesError } = await supabase
         .from("survey_responses")
-        .select("panchayath_id, ward_number");
+        .select("panchayath_id, ward_number")
+        .order("created_at", { ascending: false });
 
       if (responsesError) throw responsesError;
 
-      // Fetch views with ward info
+      // Fetch views with ward info (with cache busting)
       const { data: views, error: viewsError } = await supabase
         .from("panchayath_views" as any)
-        .select("panchayath_id, ward_number");
+        .select("panchayath_id, ward_number")
+        .order("created_at", { ascending: false });
 
       if (viewsError) throw viewsError;
 
