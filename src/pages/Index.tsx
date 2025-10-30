@@ -41,6 +41,7 @@ const Index = () => {
   const [selectedJobCategory, setSelectedJobCategory] = useState<string>("");
   const [programSearch, setProgramSearch] = useState("");
   const [customProgramDialogOpen, setCustomProgramDialogOpen] = useState(false);
+  const [panchayathWardDialogOpen, setPanchayathWardDialogOpen] = useState(false);
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -265,12 +266,22 @@ const Index = () => {
                   Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക
                 </Label>
                 <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="flex-1 justify-start text-left border-2 h-auto min-h-10 py-2"
+                    onClick={() => {
+                      if (!selectedPanchayath || !selectedWard) {
+                        setPanchayathWardDialogOpen(true);
+                      } else {
+                        setJobDialogOpen(true);
+                      }
+                    }}
+                  >
+                    {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : showCustomProgram && customProgram ? customProgram : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
+                  </Button>
+                  
                   <Dialog open={jobDialogOpen} onOpenChange={setJobDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button type="button" variant="outline" className="flex-1 justify-start text-left border-2 h-auto min-h-10 py-2">
-                        {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : showCustomProgram && customProgram ? customProgram : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
-                      </Button>
-                    </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                       <DialogTitle>Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക</DialogTitle>
@@ -568,6 +579,67 @@ const Index = () => {
                       }
                     }}>
                       Save Program / പദ്ധതി സംരക്ഷിക്കുക
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={panchayathWardDialogOpen} onOpenChange={setPanchayathWardDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Select Location / സ്ഥലം തിരഞ്ഞെടുക്കുക</DialogTitle>
+                    <DialogDescription>Please select your panchayath and ward first / ആദ്യം നിങ്ങളുടെ പഞ്ചായത്തും വാർഡും തിരഞ്ഞെടുക്കുക</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="dialogPanchayath" className="text-base">
+                        Panchayath / പഞ്ചായത്ത് *
+                      </Label>
+                      <Select value={selectedPanchayath} onValueChange={setSelectedPanchayath}>
+                        <SelectTrigger id="dialogPanchayath" className="border-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          {panchayaths.map(p => <SelectItem key={p.id} value={p.id}>
+                              {p.name_en} / {p.name_ml} ({p.district})
+                            </SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="dialogWard" className="text-base">
+                        Ward Number / വാർഡ് നമ്പർ *
+                      </Label>
+                      <Select value={selectedWard} onValueChange={setSelectedWard} disabled={!selectedPanchayath}>
+                        <SelectTrigger id="dialogWard" className="border-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          {wardNumbers.map(num => <SelectItem key={num} value={num.toString()}>
+                              Ward {num} / വാർഡ് {num}
+                            </SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button 
+                      type="button" 
+                      className="w-full" 
+                      onClick={() => {
+                        if (!selectedPanchayath || !selectedWard) {
+                          toast({
+                            title: "Error",
+                            description: "Please select both panchayath and ward",
+                            variant: "destructive"
+                          });
+                        } else {
+                          setPanchayathWardDialogOpen(false);
+                          setJobDialogOpen(true);
+                        }
+                      }}
+                    >
+                      Continue / തുടരുക
                     </Button>
                   </div>
                 </DialogContent>
