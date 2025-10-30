@@ -187,8 +187,8 @@ const Index = () => {
     } = await supabase.from("survey_responses").select("id").eq("mobile_number", mobileNumber).maybeSingle();
     if (existingResponse) {
       toast({
-        title: "Duplicate Entry",
-        description: "This mobile number has already been submitted.",
+        title: "ക്ഷമിക്കണം!!",
+        description: "ഈ മൊബൈൽ നമ്പർ ഉപയോഗിച്ച ഇതിനു മുന്നേ അഭിപ്രായം രേഖപെടുത്തിയിട്ടുണ്ട്... നന്ദി",
         variant: "destructive"
       });
       setLoading(false);
