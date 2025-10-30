@@ -19,6 +19,7 @@ interface PanchayathLead {
   panchayath_name_en: string;
   panchayath_name_ml: string;
   total_submissions: number;
+  total_views: number;
 }
 
 const LeadsManagement = () => {
@@ -32,6 +33,12 @@ const LeadsManagement = () => {
     fetchPanchayaths();
     fetchLeads();
   }, []);
+
+  useEffect(() => {
+    if (selectedPanchayath) {
+      fetchLeads();
+    }
+  }, [selectedPanchayath]);
 
   const fetchPanchayaths = async () => {
     try {
@@ -54,7 +61,8 @@ const LeadsManagement = () => {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const { data: responses, error } = await supabase
+      // Fetch submissions
+      const { data: responses, error: responsesError } = await supabase
         .from("survey_responses")
         .select(`
           panchayath_id,
@@ -64,24 +72,54 @@ const LeadsManagement = () => {
           )
         `);
 
-      if (error) throw error;
+      if (responsesError) throw responsesError;
+
+      // Fetch views
+      const { data: views, error: viewsError } = await supabase
+        .from("panchayath_views" as any)
+        .select(`
+          panchayath_id,
+          panchayaths (
+            name_en,
+            name_ml
+          )
+        `);
+
+      if (viewsError) throw viewsError;
 
       // Count submissions per panchayath
-      const leadCounts = responses?.reduce((acc: any, response: any) => {
+      const leadCounts: Record<string, PanchayathLead> = {};
+
+      responses?.forEach((response: any) => {
         const panchayathId = response.panchayath_id;
-        if (!acc[panchayathId]) {
-          acc[panchayathId] = {
+        if (!leadCounts[panchayathId]) {
+          leadCounts[panchayathId] = {
             panchayath_id: panchayathId,
             panchayath_name_en: response.panchayaths?.name_en || "Unknown",
             panchayath_name_ml: response.panchayaths?.name_ml || "അറിയില്ല",
             total_submissions: 0,
+            total_views: 0,
           };
         }
-        acc[panchayathId].total_submissions += 1;
-        return acc;
-      }, {});
+        leadCounts[panchayathId].total_submissions += 1;
+      });
 
-      setLeads(Object.values(leadCounts || {}));
+      // Count views per panchayath
+      views?.forEach((view: any) => {
+        const panchayathId = view.panchayath_id;
+        if (!leadCounts[panchayathId]) {
+          leadCounts[panchayathId] = {
+            panchayath_id: panchayathId,
+            panchayath_name_en: view.panchayaths?.name_en || "Unknown",
+            panchayath_name_ml: view.panchayaths?.name_ml || "അറിയില്ല",
+            total_submissions: 0,
+            total_views: 0,
+          };
+        }
+        leadCounts[panchayathId].total_views += 1;
+      });
+
+      setLeads(Object.values(leadCounts));
     } catch (error: any) {
       toast({
         title: "Error fetching leads",
@@ -98,6 +136,7 @@ const LeadsManagement = () => {
     : leads.filter(lead => lead.panchayath_id === selectedPanchayath);
 
   const totalSubmissions = filteredLeads.reduce((sum, lead) => sum + lead.total_submissions, 0);
+  const totalViews = filteredLeads.reduce((sum, lead) => sum + lead.total_views, 0);
 
   return (
     <div className="space-y-6">
@@ -125,9 +164,15 @@ const LeadsManagement = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Total Submissions</p>
-              <p className="text-2xl font-bold">{totalSubmissions}</p>
+            <div className="flex gap-6">
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Total Views</p>
+                <p className="text-2xl font-bold text-blue-600">{totalViews}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Total Submissions</p>
+                <p className="text-2xl font-bold text-green-600">{totalSubmissions}</p>
+              </div>
             </div>
           </div>
 
@@ -142,24 +187,28 @@ const LeadsManagement = () => {
                   <TableRow>
                     <TableHead>Panchayath (English)</TableHead>
                     <TableHead>പഞ്ചായത്ത് (Malayalam)</TableHead>
-                    <TableHead className="text-right">Total Submissions</TableHead>
+                    <TableHead className="text-right">Shows (Views)</TableHead>
+                    <TableHead className="text-right">Submissions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredLeads.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center text-muted-foreground">
-                        No submissions found
+                      <TableCell colSpan={4} className="text-center text-muted-foreground">
+                        No data found
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredLeads.map((lead) => (
-                      <TableRow key={lead.panchayath_id}>
-                        <TableCell className="font-medium">{lead.panchayath_name_en}</TableCell>
-                        <TableCell>{lead.panchayath_name_ml}</TableCell>
-                        <TableCell className="text-right font-bold">{lead.total_submissions}</TableCell>
-                      </TableRow>
-                    ))
+                    filteredLeads
+                      .sort((a, b) => b.total_views - a.total_views)
+                      .map((lead) => (
+                        <TableRow key={lead.panchayath_id}>
+                          <TableCell className="font-medium">{lead.panchayath_name_en}</TableCell>
+                          <TableCell>{lead.panchayath_name_ml}</TableCell>
+                          <TableCell className="text-right font-bold text-blue-600">{lead.total_views}</TableCell>
+                          <TableCell className="text-right font-bold text-green-600">{lead.total_submissions}</TableCell>
+                        </TableRow>
+                      ))
                   )}
                 </TableBody>
               </Table>

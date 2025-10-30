@@ -42,12 +42,32 @@ const Index = () => {
   const [programSearch, setProgramSearch] = useState("");
   const [customProgramDialogOpen, setCustomProgramDialogOpen] = useState(false);
   const [panchayathWardDialogOpen, setPanchayathWardDialogOpen] = useState(false);
+  const [viewTracked, setViewTracked] = useState(false);
+  
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
     fetchPrograms();
     fetchStats();
   }, []);
+
+  // Track view when job dialog opens
+  useEffect(() => {
+    const trackView = async () => {
+      if (jobDialogOpen && selectedPanchayath && selectedWard && !viewTracked) {
+        try {
+          await supabase.from("panchayath_views" as any).insert({
+            panchayath_id: selectedPanchayath,
+            ward_number: parseInt(selectedWard),
+          });
+          setViewTracked(true);
+        } catch (error) {
+          console.error("Error tracking view:", error);
+        }
+      }
+    };
+    trackView();
+  }, [jobDialogOpen, selectedPanchayath, selectedWard, viewTracked]);
   const fetchPanchayaths = async () => {
     const {
       data
