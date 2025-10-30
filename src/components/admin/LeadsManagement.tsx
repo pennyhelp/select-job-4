@@ -169,11 +169,15 @@ const LeadsManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Panchayaths</SelectItem>
-                  {panchayaths.map((panchayath) => (
-                    <SelectItem key={panchayath.id} value={panchayath.id}>
-                      {panchayath.name_en} / {panchayath.name_ml}
-                    </SelectItem>
-                  ))}
+                  {panchayaths.map((panchayath) => {
+                    const leadData = leads.find(lead => lead.panchayath_id === panchayath.id);
+                    const viewsCount = leadData?.total_views || 0;
+                    return (
+                      <SelectItem key={panchayath.id} value={panchayath.id}>
+                        {panchayath.name_en} / {panchayath.name_ml} ({viewsCount})
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
