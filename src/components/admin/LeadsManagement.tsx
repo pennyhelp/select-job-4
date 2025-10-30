@@ -154,19 +154,19 @@ const LeadsManagement = () => {
   const totalViews = filteredLeads.reduce((sum, lead) => sum + lead.total_views, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Panchayath Leads</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">Panchayath Leads</CardTitle>
+          <CardDescription className="text-sm">
             View survey submission counts by panchayath
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
+        <CardContent className="space-y-4 px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <div className="flex-1">
               <Select value={selectedPanchayath} onValueChange={setSelectedPanchayath}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,14 +187,14 @@ const LeadsManagement = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex gap-6">
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Total Views</p>
-                <p className="text-2xl font-bold text-blue-600">{totalViews}</p>
+            <div className="flex gap-4 sm:gap-6 justify-around sm:justify-end">
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-muted-foreground">Total Views</p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">{totalViews}</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Total Submissions</p>
-                <p className="text-2xl font-bold text-green-600">{totalSubmissions}</p>
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-muted-foreground">Total Submissions</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">{totalSubmissions}</p>
               </div>
             </div>
           </div>
@@ -204,14 +204,14 @@ const LeadsManagement = () => {
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
+            <div className="rounded-md border overflow-x-auto">
+              <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Panchayath (English)</TableHead>
-                    <TableHead>പഞ്ചായത്ത് (Malayalam)</TableHead>
-                    <TableHead className="text-right">Shows (Views)</TableHead>
-                    <TableHead className="text-right">Submissions</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Panchayath (English)</TableHead>
+                    <TableHead className="hidden sm:table-cell text-xs sm:text-sm">പഞ്ചായത്ത് (Malayalam)</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">Views</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">Submissions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -231,34 +231,34 @@ const LeadsManagement = () => {
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => toggleRow(lead.panchayath_id)}
                           >
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
+                            <TableCell className="font-medium text-xs sm:text-sm">
+                              <div className="flex items-center gap-1 sm:gap-2">
                                 {expandedRows.has(lead.panchayath_id) ? (
-                                  <ChevronDown className="h-4 w-4" />
+                                  <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                 ) : (
-                                  <ChevronRight className="h-4 w-4" />
+                                  <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                 )}
-                                {lead.panchayath_name_en}
+                                <span className="break-words">{lead.panchayath_name_en}</span>
                               </div>
                             </TableCell>
-                            <TableCell>{lead.panchayath_name_ml}</TableCell>
-                            <TableCell className="text-right font-bold text-blue-600">{lead.total_views}</TableCell>
-                            <TableCell className="text-right font-bold text-green-600">{lead.total_submissions}</TableCell>
+                            <TableCell className="hidden sm:table-cell text-xs sm:text-sm">{lead.panchayath_name_ml}</TableCell>
+                            <TableCell className="text-right font-bold text-blue-600 text-xs sm:text-sm">{lead.total_views}</TableCell>
+                            <TableCell className="text-right font-bold text-green-600 text-xs sm:text-sm">{lead.total_submissions}</TableCell>
                           </TableRow>
                           {expandedRows.has(lead.panchayath_id) && (
                             <TableRow key={`${lead.panchayath_id}-details`}>
-                              <TableCell colSpan={4} className="bg-muted/30 p-4">
+                              <TableCell colSpan={4} className="bg-muted/30 p-3 sm:p-4">
                                 <div className="space-y-2">
-                                  <h4 className="font-semibold text-sm mb-3">Ward-wise Details:</h4>
-                                  <div className="grid grid-cols-4 gap-3">
+                                  <h4 className="font-semibold text-xs sm:text-sm mb-2 sm:mb-3">Ward-wise Details:</h4>
+                                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
                                     {lead.ward_details.map((ward) => (
                                       <div 
                                         key={ward.ward_number} 
-                                        className="border rounded-lg p-3 bg-background shadow-sm"
+                                        className="border rounded-lg p-2 sm:p-3 bg-background shadow-sm"
                                       >
-                                        <div className="font-semibold text-sm mb-1">Ward {ward.ward_number}</div>
-                                        <div className="text-xs text-blue-600">Views: {ward.views}</div>
-                                        <div className="text-xs text-green-600">Submissions: {ward.submissions}</div>
+                                        <div className="font-semibold text-xs sm:text-sm mb-1">Ward {ward.ward_number}</div>
+                                        <div className="text-[10px] sm:text-xs text-blue-600">Views: {ward.views}</div>
+                                        <div className="text-[10px] sm:text-xs text-green-600">Submissions: {ward.submissions}</div>
                                       </div>
                                     ))}
                                   </div>
