@@ -43,7 +43,6 @@ const Index = () => {
   const [customProgramDialogOpen, setCustomProgramDialogOpen] = useState(false);
   const [panchayathWardDialogOpen, setPanchayathWardDialogOpen] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
-  
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -61,18 +60,23 @@ const Index = () => {
     const trackView = async () => {
       if (jobDialogOpen && selectedPanchayath && selectedWard && !viewTracked) {
         try {
-          console.log("Tracking view for:", { selectedPanchayath, selectedWard });
-          const { data, error } = await supabase.from("panchayath_views" as any).insert({
-            panchayath_id: selectedPanchayath,
-            ward_number: parseInt(selectedWard),
+          console.log("Tracking view for:", {
+            selectedPanchayath,
+            selectedWard
           });
-          
+          const {
+            data,
+            error
+          } = await supabase.from("panchayath_views" as any).insert({
+            panchayath_id: selectedPanchayath,
+            ward_number: parseInt(selectedWard)
+          });
           if (error) {
             console.error("Error tracking view:", error);
             toast({
               title: "Error tracking view",
               description: error.message,
-              variant: "destructive",
+              variant: "destructive"
             });
           } else {
             console.log("View tracked successfully:", data);
@@ -106,9 +110,11 @@ const Index = () => {
         *,
         category:categories(name),
         sub_category:sub_categories(name)
-      `).order("is_top", { ascending: false })
-      .order("priority", { ascending: false })
-      .order("name");
+      `).order("is_top", {
+      ascending: false
+    }).order("priority", {
+      ascending: false
+    }).order("name");
     if (data) setPrograms(data);
   };
   const fetchStats = async () => {
@@ -226,7 +232,7 @@ const Index = () => {
               <CheckCircle2 className="h-16 w-16 text-secondary" />
             </div>
             <CardTitle className="text-2xl">Thank You!</CardTitle>
-            <CardDescription>Your response has been recorded successfully.</CardDescription>
+            <CardDescription>നിങ്ങളുടെ പഞ്ചായത്തിന്റെ ചുമതലയുള്ള ഉദ്യോഗസ്ഥ നിങ്ങളെ ബന്ധപ്പെടും.. നന്ദി   </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm text-muted-foreground">
@@ -234,7 +240,7 @@ const Index = () => {
               <p><strong>Mobile:</strong> {mobileNumber}</p>
               <p><strong>Age:</strong> {age}</p>
               <p><strong>Ward:</strong> {selectedWard}</p>
-              <p><strong>Program:</strong> {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : customProgram}</p>
+              <p className="text-slate-950 font-bold"><strong>Program:</strong> {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : customProgram}</p>
             </div>
             <Button onClick={() => window.location.reload()} className="mt-6 w-full">
               Submit Another Response
@@ -303,18 +309,13 @@ const Index = () => {
                   Select Job Category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക
                 </Label>
                 <div className="flex gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="flex-1 justify-start text-left border-2 h-auto min-h-10 py-2"
-                    onClick={() => {
-                      if (!selectedPanchayath || !selectedWard) {
-                        setPanchayathWardDialogOpen(true);
-                      } else {
-                        setJobDialogOpen(true);
-                      }
-                    }}
-                  >
+                  <Button type="button" variant="outline" className="flex-1 justify-start text-left border-2 h-auto min-h-10 py-2" onClick={() => {
+                    if (!selectedPanchayath || !selectedWard) {
+                      setPanchayathWardDialogOpen(true);
+                    } else {
+                      setJobDialogOpen(true);
+                    }
+                  }}>
                     {selectedProgram ? programs.find(p => p.id === selectedProgram)?.name : showCustomProgram && customProgram ? customProgram : "Select job category / ജോലി വിഭാഗം തിരഞ്ഞെടുക്കുക"}
                   </Button>
                   
@@ -329,53 +330,30 @@ const Index = () => {
                         <div className="mb-4">
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                            <Input 
-                              type="text" 
-                              placeholder="Search programs directly / പദ്ധതികൾ നേരിട്ട് തിരയുക" 
-                              value={programSearch} 
-                              onChange={e => setProgramSearch(e.target.value)} 
-                              className="pl-10" 
-                            />
+                            <Input type="text" placeholder="Search programs directly / പദ്ധതികൾ നേരിട്ട് തിരയുക" value={programSearch} onChange={e => setProgramSearch(e.target.value)} className="pl-10" />
                           </div>
                         </div>
 
-                        {programSearch ? (
-                          <div>
+                        {programSearch ? <div>
                             <div className="mb-3 flex items-center justify-between">
                               <h3 className="font-semibold">Search Results</h3>
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => setProgramSearch("")}
-                              >
+                              <Button type="button" variant="outline" size="sm" onClick={() => setProgramSearch("")}>
                                 Clear Search
                               </Button>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {(() => {
-                                const filteredPrograms = programs.filter(p => 
-                                  p.name.toLowerCase().includes(programSearch.toLowerCase()) || 
-                                  p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || 
-                                  p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase())
-                                );
-                                const categoryCounters: Record<string, number> = {};
-                                
-                                return filteredPrograms.length > 0 ? (
-                                  filteredPrograms.map(p => {
-                                    const categoryName = p.category?.name || '';
-                                    const firstLetter = categoryName.charAt(0).toUpperCase();
-                                    if (!categoryCounters[p.category_id]) {
-                                      categoryCounters[p.category_id] = 100;
-                                    }
-                                    const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
-                                    categoryCounters[p.category_id]++;
-                                    
-                                    return (
-                                      <Card 
-                                        key={p.id} 
-                                        className={`transition-all hover:shadow-md cursor-pointer ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}
-                                      >
+                              const filteredPrograms = programs.filter(p => p.name.toLowerCase().includes(programSearch.toLowerCase()) || p.category?.name.toLowerCase().includes(programSearch.toLowerCase()) || p.sub_category?.name.toLowerCase().includes(programSearch.toLowerCase()));
+                              const categoryCounters: Record<string, number> = {};
+                              return filteredPrograms.length > 0 ? filteredPrograms.map(p => {
+                                const categoryName = p.category?.name || '';
+                                const firstLetter = categoryName.charAt(0).toUpperCase();
+                                if (!categoryCounters[p.category_id]) {
+                                  categoryCounters[p.category_id] = 100;
+                                }
+                                const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
+                                categoryCounters[p.category_id]++;
+                                return <Card key={p.id} className={`transition-all hover:shadow-md cursor-pointer ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}>
                                         <CardHeader className="pb-3">
                                           <CardTitle className="text-base">
                                             <span className="font-bold text-primary">{serialNumber}.</span> {p.name}
@@ -386,52 +364,32 @@ const Index = () => {
                                         </CardHeader>
                                         <CardContent className="pt-0">
                                           <div className="flex gap-2">
-                                            {p.description && (
-                                              <Button 
-                                                type="button" 
-                                                size="sm" 
-                                                variant="secondary" 
-                                                className="flex-1" 
-                                                onClick={() => {
-                                                  setSelectedProgramDetail(p);
-                                                  setDetailDialogOpen(true);
-                                                }}
-                                              >
+                                            {p.description && <Button type="button" size="sm" variant="secondary" className="flex-1" onClick={() => {
+                                        setSelectedProgramDetail(p);
+                                        setDetailDialogOpen(true);
+                                      }}>
                                                 <Info className="h-3.5 w-3.5 mr-1" />
                                                 കൂടുതൽ അറിയാൻ
-                                              </Button>
-                                            )}
-                                            <Button 
-                                              type="button" 
-                                              size="sm" 
-                                              variant="default" 
-                                              className="flex-1" 
-                                              onClick={() => {
-                                                setSelectedProgram(p.id);
-                                                setShowCustomProgram(false);
-                                                setCustomProgram("");
-                                                setJobDialogOpen(false);
-                                                setProgramSearch("");
-                                                setSelectedJobCategory("");
-                                              }}
-                                            >
+                                              </Button>}
+                                            <Button type="button" size="sm" variant="default" className="flex-1" onClick={() => {
+                                        setSelectedProgram(p.id);
+                                        setShowCustomProgram(false);
+                                        setCustomProgram("");
+                                        setJobDialogOpen(false);
+                                        setProgramSearch("");
+                                        setSelectedJobCategory("");
+                                      }}>
                                               തിരഞ്ഞെടുക്കുക
                                             </Button>
                                           </div>
                                         </CardContent>
-                                      </Card>
-                                    );
-                                  })
-                                ) : (
-                                  <div className="col-span-2 text-center py-8 text-muted-foreground">
+                                      </Card>;
+                              }) : <div className="col-span-2 text-center py-8 text-muted-foreground">
                                     No programs found matching your search
-                                  </div>
-                                );
-                              })()}
+                                  </div>;
+                            })()}
                             </div>
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          </div> : <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 backdrop-blur-md bg-primary/10 hover:bg-primary/20 border-primary/30 hover:border-primary" onClick={() => setSelectedJobCategory("all")}>
                             <CardHeader>
                               <CardTitle className="text-lg">All Programs</CardTitle>
@@ -443,20 +401,9 @@ const Index = () => {
                           </Card>
                           
                           {categories.map((category, index) => {
-                            const colorClasses = [
-                              'backdrop-blur-md bg-secondary/10 hover:bg-secondary/20 border-secondary/30 hover:border-secondary',
-                              'backdrop-blur-md bg-accent/10 hover:bg-accent/20 border-accent/30 hover:border-accent',
-                              'backdrop-blur-md bg-primary/10 hover:bg-primary/20 border-primary/30 hover:border-primary',
-                              'backdrop-blur-md bg-destructive/10 hover:bg-destructive/20 border-destructive/30 hover:border-destructive',
-                            ];
+                            const colorClasses = ['backdrop-blur-md bg-secondary/10 hover:bg-secondary/20 border-secondary/30 hover:border-secondary', 'backdrop-blur-md bg-accent/10 hover:bg-accent/20 border-accent/30 hover:border-accent', 'backdrop-blur-md bg-primary/10 hover:bg-primary/20 border-primary/30 hover:border-primary', 'backdrop-blur-md bg-destructive/10 hover:bg-destructive/20 border-destructive/30 hover:border-destructive'];
                             const colorClass = colorClasses[index % colorClasses.length];
-                            
-                            return (
-                              <Card 
-                                key={category.id} 
-                                onClick={() => setSelectedJobCategory(category.id)} 
-                                className={`cursor-pointer hover:shadow-lg transition-all border-2 ${colorClass}`}
-                              >
+                            return <Card key={category.id} onClick={() => setSelectedJobCategory(category.id)} className={`cursor-pointer hover:shadow-lg transition-all border-2 ${colorClass}`}>
                                 <CardHeader>
                                   <CardTitle className="text-lg">{category.name}</CardTitle>
                                 </CardHeader>
@@ -465,8 +412,7 @@ const Index = () => {
                                     {programs.filter(p => p.category_id === category.id).length} programs
                                   </p>
                                 </CardContent>
-                              </Card>
-                            );
+                              </Card>;
                           })}
                           
                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 backdrop-blur-md bg-muted/30 hover:bg-muted/50 border-muted-foreground/30 hover:border-muted-foreground" onClick={() => {
@@ -481,8 +427,7 @@ const Index = () => {
                               <p className="text-sm text-muted-foreground">നിങ്ങളുടെ സ്വന്തം പ്രോഗ്രാം എഴുതുക</p>
                             </CardContent>
                           </Card>
-                          </div>
-                        )}
+                          </div>}
                       </div> : <div className="overflow-y-auto flex-1">
                         <div className="mb-4 space-y-3">
                           <Button type="button" variant="outline" size="sm" onClick={() => {
@@ -660,22 +605,18 @@ const Index = () => {
                       </Select>
                     </div>
 
-                    <Button 
-                      type="button" 
-                      className="w-full" 
-                      onClick={() => {
-                        if (!selectedPanchayath || !selectedWard) {
-                          toast({
-                            title: "Error",
-                            description: "Please select both panchayath and ward",
-                            variant: "destructive"
-                          });
-                        } else {
-                          setPanchayathWardDialogOpen(false);
-                          setJobDialogOpen(true);
-                        }
-                      }}
-                    >
+                    <Button type="button" className="w-full" onClick={() => {
+                      if (!selectedPanchayath || !selectedWard) {
+                        toast({
+                          title: "Error",
+                          description: "Please select both panchayath and ward",
+                          variant: "destructive"
+                        });
+                      } else {
+                        setPanchayathWardDialogOpen(false);
+                        setJobDialogOpen(true);
+                      }
+                    }}>
                       Continue / തുടരുക
                     </Button>
                   </div>
