@@ -285,7 +285,7 @@ const Index = () => {
             <Card className="bg-card/80 backdrop-blur border-primary/20 shadow-glow">
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground mb-1">Total Submissions</p>
-                <p className="text-2xl font-bold text-primary">{1000 + totalSubmissions}</p>
+                <p className="text-2xl font-bold text-primary">{1230 + totalSubmissions}</p>
               </CardContent>
             </Card>
             <Card className="bg-card/80 backdrop-blur border-accent/20 shadow-glow">
