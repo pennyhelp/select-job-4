@@ -286,9 +286,7 @@ const Index = () => {
           <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-4">
             സ്വയം തൊഴിൽ പദ്ധതി സർവേ
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Help us understand your employment preferences / നിങ്ങളുടെ തൊഴിൽ മുൻഗണനകൾ മനസ്സിലാക്കാൻ ഞങ്ങളെ സഹായിക്കുക
-          </p>
+          <p className="text-lg text-muted-foreground">ഈ സർവ്വേ ഒരു പ്രദേശത്ത് സ്വയംതൊഴിൽ ആവശ്യക്കാരെ കണ്ടത്താനും കൂടുതൽ ആളുകളുടെ താല്പര്യം മനസ്സിലാക്കാനും വേണ്ടിയാണ്. സ്വയംതൊഴിൽ രേങിസ്ട്രറേൻ മുന്നോട്ട് പോകാൻ കസ്റ്റമർ രജിസ്‌ട്രേഷൻ പോർട്ടലിൽ രജിസ്ട്രഷൺ പൂർത്തിയാകേണ്ടതുണ്ട്....</p>
           
           <div className="flex justify-center gap-4 mt-6 mb-4">
             <Card className="bg-card/80 backdrop-blur border-primary/20 shadow-glow">
