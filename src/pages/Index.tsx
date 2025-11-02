@@ -290,9 +290,9 @@ const Index = () => {
           
           <div className="flex justify-center gap-4 mt-6 mb-4">
             <Card className="bg-card/80 backdrop-blur border-primary/20 shadow-glow">
-              <CardContent className="p-4">
-                <p className="text-sm text-muted-foreground mb-1">Total Submissions</p>
-                <p className="text-2xl font-bold text-primary">{1230 + totalSubmissions}</p>
+              <CardContent className="p-4 bg-sky-800">
+                <p className="text-sm mb-1 text-slate-50">Total Submissions</p>
+                <p className="text-2xl font-bold text-slate-50">{1230 + totalSubmissions}</p>
               </CardContent>
             </Card>
             <Card className="bg-card/80 backdrop-blur border-accent/20 shadow-glow">
