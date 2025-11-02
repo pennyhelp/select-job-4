@@ -150,8 +150,9 @@ const LeadsManagement = () => {
     ? leads
     : leads.filter(lead => lead.panchayath_id === selectedPanchayath);
 
-  const totalSubmissions = filteredLeads.reduce((sum, lead) => sum + lead.total_submissions, 0);
-  const totalViews = filteredLeads.reduce((sum, lead) => sum + lead.total_views, 0);
+  // Calculate grand totals across ALL panchayaths (not filtered)
+  const totalSubmissions = leads.reduce((sum, lead) => sum + lead.total_submissions, 0);
+  const totalViews = leads.reduce((sum, lead) => sum + lead.total_views, 0);
 
   return (
     <div className="space-y-4 sm:space-y-6">
