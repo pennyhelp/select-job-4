@@ -414,7 +414,7 @@ const Index = () => {
                                 <CardHeader>
                                   <CardTitle className="text-lg">{category.name}</CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="bg-slate-50">
                                   <p className="text-sm text-muted-foreground">
                                     {programs.filter(p => p.category_id === category.id).length} programs
                                   </p>
