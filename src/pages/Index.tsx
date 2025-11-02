@@ -43,6 +43,8 @@ const Index = () => {
   const [customProgramDialogOpen, setCustomProgramDialogOpen] = useState(false);
   const [panchayathWardDialogOpen, setPanchayathWardDialogOpen] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
+  const [subCategories, setSubCategories] = useState<any[]>([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -116,6 +118,15 @@ const Index = () => {
       ascending: false
     }).order("name");
     if (data) setPrograms(data);
+  };
+
+  const fetchSubCategories = async (categoryId: string) => {
+    const { data } = await supabase
+      .from("sub_categories")
+      .select("*")
+      .eq("category_id", categoryId)
+      .order("name");
+    if (data) setSubCategories(data);
   };
   const fetchStats = async () => {
     const {
@@ -203,8 +214,8 @@ const Index = () => {
       name,
       mobile_number: mobileNumber,
       age: parseInt(age),
-      category_id: selectedProgramData?.category_id || null,
-      sub_category_id: selectedProgramData?.sub_category_id || null,
+      category_id: selectedProgramData?.category_id || selectedJobCategory || null,
+      sub_category_id: selectedProgramData?.sub_category_id || selectedSubCategory || null,
       program_id: selectedProgram || null,
       custom_program: customProgram.trim() || null
     });
@@ -425,6 +436,7 @@ const Index = () => {
                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 backdrop-blur-md bg-muted/30 hover:bg-muted/50 border-muted-foreground/30 hover:border-muted-foreground" onClick={() => {
                             setCustomProgramDialogOpen(true);
                             setJobDialogOpen(false);
+                            setSelectedSubCategory("");
                           }}>
                             <CardHeader>
                               <CardTitle className="text-lg">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
@@ -493,12 +505,19 @@ const Index = () => {
                                </Card>;
                               })}
                            
-                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary" onClick={() => {
+                           <Card className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-secondary" onClick={async () => {
                                 setCustomProgramDialogOpen(true);
                                 setSelectedProgram("");
                                 setJobDialogOpen(false);
-                                setSelectedJobCategory("");
+                                setSelectedSubCategory("");
                                 setProgramSearch("");
+                                // Fetch sub-categories if Marketing category is selected
+                                if (selectedJobCategory) {
+                                  const marketingCategory = categories.find(c => c.name === "Marketing");
+                                  if (marketingCategory && selectedJobCategory === marketingCategory.id) {
+                                    await fetchSubCategories(selectedJobCategory);
+                                  }
+                                }
                               }}>
                              <CardHeader className="pb-3">
                                <CardTitle className="text-base">ഇവയിൽ ഉൾപ്പെടാത്തത്</CardTitle>
@@ -549,23 +568,83 @@ const Index = () => {
                     <DialogDescription>നിങ്ങളുടെ പദ്ധതി എഴുതുക</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="customProgramInput" className="text-base">
-                        Program Name / പദ്ധതിയുടെ പേര് *
-                      </Label>
-                      <Input id="customProgramInput" value={customProgram} onChange={e => setCustomProgram(e.target.value)} placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക" maxLength={200} className="border-2" />
-                    </div>
+                    {(() => {
+                      const marketingCategory = categories.find(c => c.name === "Marketing");
+                      const isMarketing = marketingCategory && selectedJobCategory === marketingCategory.id;
+                      
+                      return isMarketing && subCategories.length > 0 ? (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="subCategorySelect" className="text-base">
+                              Select Sub Category / ഉപവിഭാഗം തിരഞ്ഞെടുക്കുക *
+                            </Label>
+                            <Select value={selectedSubCategory} onValueChange={setSelectedSubCategory}>
+                              <SelectTrigger id="subCategorySelect" className="border-2">
+                                <SelectValue placeholder="Select sub category / ഉപവിഭാഗം തിരഞ്ഞെടുക്കുക" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-popover z-50">
+                                {subCategories.map(sc => (
+                                  <SelectItem key={sc.id} value={sc.id}>
+                                    {sc.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="customProgramInput" className="text-base">
+                              Program Name / പദ്ധതിയുടെ പേര് *
+                            </Label>
+                            <Input 
+                              id="customProgramInput" 
+                              value={customProgram} 
+                              onChange={e => setCustomProgram(e.target.value)} 
+                              placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക" 
+                              maxLength={200} 
+                              className="border-2" 
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="space-y-2">
+                          <Label htmlFor="customProgramInput" className="text-base">
+                            Program Name / പദ്ധതിയുടെ പേര് *
+                          </Label>
+                          <Input 
+                            id="customProgramInput" 
+                            value={customProgram} 
+                            onChange={e => setCustomProgram(e.target.value)} 
+                            placeholder="Enter your program / നിങ്ങളുടെ പദ്ധതി എഴുതുക" 
+                            maxLength={200} 
+                            className="border-2" 
+                          />
+                        </div>
+                      );
+                    })()}
                     <Button type="button" className="w-full" onClick={() => {
-                      if (customProgram.trim()) {
-                        setShowCustomProgram(true);
-                        setCustomProgramDialogOpen(false);
-                      } else {
+                      const marketingCategory = categories.find(c => c.name === "Marketing");
+                      const isMarketing = marketingCategory && selectedJobCategory === marketingCategory.id;
+                      
+                      if (!customProgram.trim()) {
                         toast({
                           title: "Error",
                           description: "Please enter a program name",
                           variant: "destructive"
                         });
+                        return;
                       }
+                      
+                      if (isMarketing && subCategories.length > 0 && !selectedSubCategory) {
+                        toast({
+                          title: "Error",
+                          description: "Please select a sub category",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      
+                      setShowCustomProgram(true);
+                      setCustomProgramDialogOpen(false);
                     }}>
                       Save Program / പദ്ധതി സംരക്ഷിക്കുക
                     </Button>
