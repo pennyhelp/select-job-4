@@ -209,11 +209,20 @@ const Index = () => {
       custom_program: customProgram.trim() || null
     });
     if (error) {
-      toast({
-        title: "Submission Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      // Check if it's a duplicate mobile number error (database unique constraint)
+      if (error.code === '23505' && error.message.includes('mobile_number')) {
+        toast({
+          title: "ക്ഷമിക്കണം!!",
+          description: "ഈ മൊബൈൽ നമ്പർ ഉപയോഗിച്ച ഇതിനു മുന്നേ അഭിപ്രായം രേഖപെടുത്തിയിട്ടുണ്ട്... നന്ദി",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Submission Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
     } else {
       setSubmitted(true);
       fetchStats(); // Refresh the stats after successful submission
