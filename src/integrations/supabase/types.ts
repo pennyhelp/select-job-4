@@ -32,6 +32,35 @@ export type Database = {
         }
         Relationships: []
       }
+      panchayath_views: {
+        Row: {
+          created_at: string | null
+          id: string
+          panchayath_id: string
+          ward_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          panchayath_id: string
+          ward_number: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          panchayath_id?: string
+          ward_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "panchayath_views_panchayath_id_fkey"
+            columns: ["panchayath_id"]
+            isOneToOne: false
+            referencedRelation: "panchayaths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       panchayaths: {
         Row: {
           created_at: string | null
@@ -63,22 +92,31 @@ export type Database = {
         Row: {
           category_id: string
           created_at: string | null
+          description: string | null
           id: string
+          is_top: boolean | null
           name: string
+          priority: number | null
           sub_category_id: string
         }
         Insert: {
           category_id: string
           created_at?: string | null
+          description?: string | null
           id?: string
+          is_top?: boolean | null
           name: string
+          priority?: number | null
           sub_category_id: string
         }
         Update: {
           category_id?: string
           created_at?: string | null
+          description?: string | null
           id?: string
+          is_top?: boolean | null
           name?: string
+          priority?: number | null
           sub_category_id?: string
         }
         Relationships: [
