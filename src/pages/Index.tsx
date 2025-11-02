@@ -296,9 +296,9 @@ const Index = () => {
               </CardContent>
             </Card>
             <Card className="bg-card/80 backdrop-blur border-accent/20 shadow-glow">
-              <CardContent className="p-4">
-                <p className="text-sm text-muted-foreground mb-1">Panchayaths</p>
-                <p className="text-2xl font-bold text-accent">{totalPanchayaths}</p>
+              <CardContent className="p-4 bg-pink-900">
+                <p className="text-sm mb-1 text-slate-50">Panchayaths</p>
+                <p className="text-2xl font-bold text-slate-50">{totalPanchayaths}</p>
               </CardContent>
             </Card>
           </div>
