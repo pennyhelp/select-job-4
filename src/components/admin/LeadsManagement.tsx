@@ -175,13 +175,14 @@ const LeadsManagement = () => {
                   {panchayaths.map((panchayath) => {
                     const leadData = leads.find(lead => lead.panchayath_id === panchayath.id);
                     const viewsCount = leadData?.total_views || 0;
+                    const submissionsCount = leadData?.total_submissions || 0;
                     return (
                       <SelectItem 
                         key={panchayath.id} 
                         value={panchayath.id}
                         className={viewsCount > 0 ? "bg-green-600 text-white hover:bg-green-700 focus:bg-green-700" : "bg-red-600 text-white hover:bg-red-700 focus:bg-red-700"}
                       >
-                        {panchayath.name_en} / {panchayath.name_ml} ({viewsCount})
+                        {panchayath.name_en} / {panchayath.name_ml} ({viewsCount}/<span className="font-bold">{submissionsCount}</span>)
                       </SelectItem>
                     );
                   })}
