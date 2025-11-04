@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, FileDown, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +19,7 @@ const SurveyResponses = () => {
   const { toast } = useToast();
   const [responses, setResponses] = useState<any[]>([]);
   const [filteredResponses, setFilteredResponses] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("completed");
   const [panchayaths, setPanchayaths] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [subCategories, setSubCategories] = useState<any[]>([]);
@@ -41,7 +43,7 @@ const SurveyResponses = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [responses, filterPanchayath, filterCategory, filterSubCategory, filterProgram]);
+  }, [responses, filterPanchayath, filterCategory, filterSubCategory, filterProgram, activeTab]);
 
   const fetchResponses = async () => {
     const { data } = await supabase
@@ -80,16 +82,23 @@ const SurveyResponses = () => {
   const applyFilters = () => {
     let filtered = [...responses];
 
+    // Filter by tab first
+    if (activeTab === "completed") {
+      filtered = filtered.filter((r) => r.category_id !== null);
+    } else {
+      filtered = filtered.filter((r) => r.category_id === null);
+    }
+
     if (filterPanchayath) {
       filtered = filtered.filter((r) => r.panchayath_id === filterPanchayath);
     }
-    if (filterCategory) {
+    if (filterCategory && activeTab === "completed") {
       filtered = filtered.filter((r) => r.category_id === filterCategory);
     }
-    if (filterSubCategory) {
+    if (filterSubCategory && activeTab === "completed") {
       filtered = filtered.filter((r) => r.sub_category_id === filterSubCategory);
     }
-    if (filterProgram) {
+    if (filterProgram && activeTab === "completed") {
       filtered = filtered.filter((r) => r.program_id === filterProgram);
     }
 
@@ -203,141 +212,164 @@ const SurveyResponses = () => {
       <Card>
         <CardHeader>
           <CardTitle>Survey Responses</CardTitle>
-          <CardDescription>View and filter submitted survey responses</CardDescription>
+          <CardDescription>View and manage survey data</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-4 gap-4">
-            <Select value={filterPanchayath} onValueChange={setFilterPanchayath}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Panchayath" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value=" ">All Panchayaths</SelectItem>
-                {panchayaths.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name_en} / {p.name_ml}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="completed">Submission Report</TabsTrigger>
+              <TabsTrigger value="incomplete">Visited but Not Submitted</TabsTrigger>
+            </TabsList>
 
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Category" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value=" ">All Categories</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <TabsContent value={activeTab} className="space-y-4 mt-4">
+              <div className="grid md:grid-cols-4 gap-4">
+                <Select value={filterPanchayath} onValueChange={setFilterPanchayath}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by Panchayath" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value=" ">All Panchayaths</SelectItem>
+                    {panchayaths.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name_en} / {p.name_ml}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            <Select value={filterSubCategory} onValueChange={setFilterSubCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Sub-Category" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value=" ">All Sub-Categories</SelectItem>
-                {subCategories.map((sc) => (
-                  <SelectItem key={sc.id} value={sc.id}>
-                    {sc.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                {activeTab === "completed" && (
+                  <>
+                    <Select value={filterCategory} onValueChange={setFilterCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filter by Category" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover z-50">
+                        <SelectItem value=" ">All Categories</SelectItem>
+                        {categories.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-            <Select value={filterProgram} onValueChange={setFilterProgram}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Program" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value=" ">All Programs</SelectItem>
-                {programs.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    <Select value={filterSubCategory} onValueChange={setFilterSubCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filter by Sub-Category" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover z-50">
+                        <SelectItem value=" ">All Sub-Categories</SelectItem>
+                        {subCategories.map((sc) => (
+                          <SelectItem key={sc.id} value={sc.id}>
+                            {sc.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-          <div className="flex gap-2">
-            <Button onClick={exportToExcel} variant="outline">
-              <FileDown className="mr-2 h-4 w-4" />
-              Export to Excel
-            </Button>
-            <Button onClick={exportToPDF} variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Export to PDF
-            </Button>
-          </div>
+                    <Select value={filterProgram} onValueChange={setFilterProgram}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filter by Program" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover z-50">
+                        <SelectItem value=" ">All Programs</SelectItem>
+                        {programs.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
+                )}
+              </div>
 
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Mobile</TableHead>
-                  <TableHead>Age</TableHead>
-                  <TableHead>Panchayath</TableHead>
-                  <TableHead>Ward</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Sub-Category</TableHead>
-                  <TableHead>Program</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredResponses.map((r: any) => (
-                  <TableRow key={r.id}>
-                    <TableCell>{r.name}</TableCell>
-                    <TableCell>{r.mobile_number}</TableCell>
-                    <TableCell>{r.age}</TableCell>
-                    <TableCell>
-                      {r.panchayaths?.name_en} / {r.panchayaths?.name_ml} ({r.panchayaths?.district})
-                    </TableCell>
-                    <TableCell>{r.ward_number}</TableCell>
-                    <TableCell>{r.categories?.name || "—"}</TableCell>
-                    <TableCell>{r.sub_categories?.name || "—"}</TableCell>
-                    <TableCell>
-                      {r.programs?.name || r.custom_program || "—"}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(r.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(r)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setDeleteId(r.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+              <div className="flex gap-2">
+                <Button onClick={exportToExcel} variant="outline">
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Export to Excel
+                </Button>
+                <Button onClick={exportToPDF} variant="outline">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export to PDF
+                </Button>
+              </div>
 
-          {filteredResponses.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">
-              No responses found
-            </p>
-          )}
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Mobile</TableHead>
+                      <TableHead>Age</TableHead>
+                      <TableHead>Panchayath</TableHead>
+                      <TableHead>Ward</TableHead>
+                      {activeTab === "completed" && (
+                        <>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Sub-Category</TableHead>
+                          <TableHead>Program</TableHead>
+                        </>
+                      )}
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredResponses.map((r: any) => (
+                      <TableRow key={r.id}>
+                        <TableCell>{r.name}</TableCell>
+                        <TableCell>{r.mobile_number}</TableCell>
+                        <TableCell>{r.age}</TableCell>
+                        <TableCell>
+                          {r.panchayaths?.name_en} / {r.panchayaths?.name_ml} ({r.panchayaths?.district})
+                        </TableCell>
+                        <TableCell>{r.ward_number}</TableCell>
+                        {activeTab === "completed" && (
+                          <>
+                            <TableCell>{r.categories?.name || "—"}</TableCell>
+                            <TableCell>{r.sub_categories?.name || "—"}</TableCell>
+                            <TableCell>
+                              {r.programs?.name || r.custom_program || "—"}
+                            </TableCell>
+                          </>
+                        )}
+                        <TableCell>
+                          {new Date(r.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(r)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteId(r.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {filteredResponses.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">
+                  {activeTab === "completed" 
+                    ? "No completed submissions found" 
+                    : "No incomplete visits found"}
+                </p>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
