@@ -689,10 +689,11 @@ const Index = () => {
                                   }
                                   const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
                                   categoryCounters[p.category_id]++;
+                                  const displayName = `${p.category?.name} - ${p.name}`;
                                   return <Card key={p.id} className={`transition-all hover:shadow-md cursor-pointer ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}>
                                           <CardHeader className="pb-3">
                                             <CardTitle className="text-base">
-                                              <span className="font-bold text-primary">{serialNumber}.</span> {p.name}
+                                              <span className="font-bold text-primary">{serialNumber}.</span> {displayName}
                                             </CardTitle>
                                             <CardDescription className="text-xs">
                                               {p.category?.name} → {p.sub_category?.name}
@@ -793,10 +794,11 @@ const Index = () => {
                                   }
                                   const serialNumber = `${firstLetter}${categoryCounters[p.category_id]}`;
                                   categoryCounters[p.category_id]++;
+                                  const displayName = `${p.category?.name} - ${p.name}`;
                                   return <Card key={p.id} className={`transition-all hover:shadow-md ${selectedProgram === p.id ? 'border-primary border-2 bg-accent' : ''}`}>
                                     <CardHeader className="pb-3">
                                       <CardTitle className="text-base">
-                                        <span className="font-bold text-primary">{serialNumber}.</span> {p.name}
+                                        <span className="font-bold text-primary">{serialNumber}.</span> {displayName}
                                       </CardTitle>
                                       <CardDescription className="text-xs">
                                         {p.category?.name} → {p.sub_category?.name}
