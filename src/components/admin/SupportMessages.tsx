@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CheckCircle, Clock } from "lucide-react";
+import { CheckCircle, Clock, MessageCircle } from "lucide-react";
 
 interface SupportMessage {
   id: string;
@@ -53,6 +53,13 @@ export const SupportMessages = () => {
       console.error("Error updating message:", error);
       toast.error("Failed to update message");
     }
+  };
+
+  const handleWhatsAppChat = (contactNumber: string) => {
+    const message = "നിങ്ങളുടെ പേര്, മൊബൈൽ നമ്പർ, പഞ്ചായത്ത് , വാർഡ് , വയസ്സ് , എന്നിവ അയക്കുക, പിന്നീട് നിങ്ങളുടെ പഞ്ചായത്തിന്റെ ചുമതലയുള്ള ആൾ നിങ്ങളുമായി ബന്ധപ്പെടും, നന്ദി... 🙏";
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/91${contactNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   useEffect(() => {
@@ -112,14 +119,24 @@ export const SupportMessages = () => {
                   <span className="text-xs text-muted-foreground">
                     {new Date(msg.created_at).toLocaleString("ml-IN")}
                   </span>
-                  {msg.status === "pending" && (
+                  <div className="flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => markAsResolved(msg.id)}
+                      variant="outline"
+                      onClick={() => handleWhatsAppChat(msg.contact_number)}
                     >
-                      Mark as Resolved
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      WhatsApp
                     </Button>
-                  )}
+                    {msg.status === "pending" && (
+                      <Button
+                        size="sm"
+                        onClick={() => markAsResolved(msg.id)}
+                      >
+                        Mark as Resolved
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
