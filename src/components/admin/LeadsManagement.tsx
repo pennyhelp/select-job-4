@@ -252,15 +252,25 @@ const LeadsManagement = () => {
                               <TableCell colSpan={4} className="bg-muted/30 p-3 sm:p-4">
                                 <div className="space-y-2">
                                   <h4 className="font-semibold text-xs sm:text-sm mb-2 sm:mb-3">Ward-wise Details:</h4>
-                                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
+                                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
                                     {lead.ward_details.map((ward) => (
                                       <div 
                                         key={ward.ward_number} 
-                                        className="border rounded-lg p-2 sm:p-3 bg-background shadow-sm"
+                                        className={`border rounded-lg p-2 sm:p-3 shadow-sm ${
+                                          ward.submissions === 0 
+                                            ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900' 
+                                            : 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900'
+                                        }`}
                                       >
                                         <div className="font-semibold text-xs sm:text-sm mb-1">Ward {ward.ward_number}</div>
-                                        <div className="text-[10px] sm:text-xs text-blue-600">Views: {ward.views}</div>
-                                        <div className="text-[10px] sm:text-xs text-green-600">Submissions: {ward.submissions}</div>
+                                        <div className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400">Views: {ward.views}</div>
+                                        <div className={`text-[10px] sm:text-xs font-semibold ${
+                                          ward.submissions === 0 
+                                            ? 'text-red-600 dark:text-red-400' 
+                                            : 'text-green-600 dark:text-green-400'
+                                        }`}>
+                                          Submissions: {ward.submissions}
+                                        </div>
                                       </div>
                                     ))}
                                   </div>
