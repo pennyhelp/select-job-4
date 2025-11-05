@@ -10,6 +10,7 @@ import ProgramManagement from "@/components/admin/ProgramManagement";
 import SurveyResponses from "@/components/admin/SurveyResponses";
 import UserManagement from "@/components/admin/UserManagement";
 import LeadsManagement from "@/components/admin/LeadsManagement";
+import { SupportMessages } from "@/components/admin/SupportMessages";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -72,9 +73,10 @@ const Admin = () => {
       <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <Tabs defaultValue="responses" className="space-y-4 sm:space-y-6">
           <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full gap-1 p-1" style={{ gridTemplateColumns: `repeat(${isSuperAdmin ? 6 : 5}, minmax(0, 1fr))` }}>
+            <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full gap-1 p-1" style={{ gridTemplateColumns: `repeat(${isSuperAdmin ? 7 : 6}, minmax(0, 1fr))` }}>
               <TabsTrigger value="responses" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">Responses</TabsTrigger>
               <TabsTrigger value="leads" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">Leads</TabsTrigger>
+              <TabsTrigger value="support" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">Support</TabsTrigger>
               <TabsTrigger value="panchayaths" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">Panchayaths</TabsTrigger>
               <TabsTrigger value="categories" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">Categories</TabsTrigger>
               <TabsTrigger value="programs" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">Programs</TabsTrigger>
@@ -90,6 +92,10 @@ const Admin = () => {
 
           <TabsContent value="leads">
             <LeadsManagement />
+          </TabsContent>
+
+          <TabsContent value="support">
+            <SupportMessages />
           </TabsContent>
 
           <TabsContent value="panchayaths">

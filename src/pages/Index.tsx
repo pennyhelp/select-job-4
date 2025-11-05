@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle2, Search, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import { HelpChatButton } from "@/components/HelpChatButton";
 const surveySchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   mobileNumber: z.string().trim().regex(/^[0-9]{10}$/, "Mobile number must be 10 digits"),
@@ -984,6 +985,7 @@ const Index = () => {
         </Card>
         </div>
       </div>
+      <HelpChatButton />
     </div>;
 };
 export default Index;
