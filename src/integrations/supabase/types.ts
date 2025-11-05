@@ -32,6 +32,41 @@ export type Database = {
         }
         Relationships: []
       }
+      incomplete_surveys: {
+        Row: {
+          created_at: string | null
+          id: string
+          mobile_number: string
+          name: string
+          panchayath_id: string | null
+          ward_number: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mobile_number: string
+          name: string
+          panchayath_id?: string | null
+          ward_number?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mobile_number?: string
+          name?: string
+          panchayath_id?: string | null
+          ward_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incomplete_surveys_panchayath_id_fkey"
+            columns: ["panchayath_id"]
+            isOneToOne: false
+            referencedRelation: "panchayaths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       panchayath_views: {
         Row: {
           created_at: string | null

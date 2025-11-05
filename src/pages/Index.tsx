@@ -46,6 +46,7 @@ const Index = () => {
   const [subCategories, setSubCategories] = useState<any[]>([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [currentStep, setCurrentStep] = useState(1);
+  const [incompleteSurveyId, setIncompleteSurveyId] = useState<string | null>(null);
   useEffect(() => {
     fetchPanchayaths();
     fetchCategories();
@@ -236,6 +237,14 @@ const Index = () => {
         });
       }
     } else {
+      // Delete incomplete survey record on successful submission
+      if (incompleteSurveyId) {
+        await supabase
+          .from("incomplete_surveys")
+          .delete()
+          .eq("id", incompleteSurveyId);
+      }
+      
       setSubmitted(true);
       fetchStats(); // Refresh the stats after successful submission
       toast({
@@ -397,18 +406,33 @@ const Index = () => {
                         ← Back / തിരികെ
                       </Button>
                       <Button 
-                        type="button" 
-                        className="flex-1 text-lg py-6" 
-                        onClick={() => {
-                          if (!/^[0-9]{10}$/.test(mobileNumber)) {
-                            toast({
-                              title: "Error",
-                              description: "Please enter a valid 10-digit mobile number",
-                              variant: "destructive"
-                            });
-                            return;
-                          }
-                          setCurrentStep(3);
+                      type="button" 
+                      className="flex-1 text-lg py-6" 
+                      onClick={async () => {
+                        if (!/^[0-9]{10}$/.test(mobileNumber)) {
+                          toast({
+                            title: "Error",
+                            description: "Please enter a valid 10-digit mobile number",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        // Create or update incomplete survey record
+                        const { data, error } = await supabase
+                          .from("incomplete_surveys")
+                          .insert({
+                            name,
+                            mobile_number: mobileNumber
+                          })
+                          .select()
+                          .single();
+                        
+                        if (data) {
+                          setIncompleteSurveyId(data.id);
+                        }
+                        
+                        setCurrentStep(3);
                         }}
                       >
                         തുടരുക (Continue)
@@ -450,18 +474,27 @@ const Index = () => {
                         ← Back / തിരികെ
                       </Button>
                       <Button 
-                        type="button" 
-                        className="flex-1 text-lg py-6" 
-                        onClick={() => {
-                          if (!selectedPanchayath) {
-                            toast({
-                              title: "Error",
-                              description: "Please select a panchayath / പഞ്ചായത്ത് തിരഞ്ഞെടുക്കുക",
-                              variant: "destructive"
-                            });
-                            return;
-                          }
-                          setCurrentStep(4);
+                      type="button" 
+                      className="flex-1 text-lg py-6" 
+                      onClick={async () => {
+                        if (!selectedPanchayath) {
+                          toast({
+                            title: "Error",
+                            description: "Please select a panchayath / പഞ്ചായത്ത് തിരഞ്ഞെടുക്കുക",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        // Update incomplete survey with panchayath
+                        if (incompleteSurveyId) {
+                          await supabase
+                            .from("incomplete_surveys")
+                            .update({ panchayath_id: selectedPanchayath })
+                            .eq("id", incompleteSurveyId);
+                        }
+                        
+                        setCurrentStep(4);
                         }}
                       >
                         തുടരുക (Continue)
@@ -503,18 +536,27 @@ const Index = () => {
                         ← Back / തിരികെ
                       </Button>
                       <Button 
-                        type="button" 
-                        className="flex-1 text-lg py-6" 
-                        onClick={() => {
-                          if (!selectedWard) {
-                            toast({
-                              title: "Error",
-                              description: "Please select a ward / വാർഡ് തിരഞ്ഞെടുക്കുക",
-                              variant: "destructive"
-                            });
-                            return;
-                          }
-                          setCurrentStep(5);
+                      type="button" 
+                      className="flex-1 text-lg py-6" 
+                      onClick={async () => {
+                        if (!selectedWard) {
+                          toast({
+                            title: "Error",
+                            description: "Please select a ward / വാർഡ് തിരഞ്ഞെടുക്കുക",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        // Update incomplete survey with ward
+                        if (incompleteSurveyId) {
+                          await supabase
+                            .from("incomplete_surveys")
+                            .update({ ward_number: parseInt(selectedWard) })
+                            .eq("id", incompleteSurveyId);
+                        }
+                        
+                        setCurrentStep(5);
                         }}
                       >
                         തുടരുക (Continue)

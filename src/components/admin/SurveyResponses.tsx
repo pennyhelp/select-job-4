@@ -18,6 +18,7 @@ import autoTable from "jspdf-autotable";
 const SurveyResponses = () => {
   const { toast } = useToast();
   const [responses, setResponses] = useState<any[]>([]);
+  const [incompleteResponses, setIncompleteResponses] = useState<any[]>([]);
   const [filteredResponses, setFilteredResponses] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("completed");
   const [panchayaths, setPanchayaths] = useState<any[]>([]);
@@ -35,6 +36,7 @@ const SurveyResponses = () => {
 
   useEffect(() => {
     fetchResponses();
+    fetchIncompleteResponses();
     fetchPanchayaths();
     fetchCategories();
     fetchSubCategories();
@@ -43,7 +45,7 @@ const SurveyResponses = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [responses, filterPanchayath, filterCategory, filterSubCategory, filterProgram, activeTab]);
+  }, [responses, incompleteResponses, filterPanchayath, filterCategory, filterSubCategory, filterProgram, activeTab]);
 
   const fetchResponses = async () => {
     const { data } = await supabase
@@ -57,6 +59,17 @@ const SurveyResponses = () => {
       `)
       .order("created_at", { ascending: false });
     if (data) setResponses(data);
+  };
+
+  const fetchIncompleteResponses = async () => {
+    const { data } = await supabase
+      .from("incomplete_surveys")
+      .select(`
+        *,
+        panchayaths(name_en, name_ml, district)
+      `)
+      .order("created_at", { ascending: false });
+    if (data) setIncompleteResponses(data);
   };
 
   const fetchPanchayaths = async () => {
@@ -80,26 +93,30 @@ const SurveyResponses = () => {
   };
 
   const applyFilters = () => {
-    let filtered = [...responses];
+    let filtered: any[] = [];
 
     // Filter by tab first
     if (activeTab === "completed") {
-      filtered = filtered.filter((r) => r.category_id !== null);
+      filtered = [...responses];
+      
+      if (filterPanchayath) {
+        filtered = filtered.filter((r) => r.panchayath_id === filterPanchayath);
+      }
+      if (filterCategory) {
+        filtered = filtered.filter((r) => r.category_id === filterCategory);
+      }
+      if (filterSubCategory) {
+        filtered = filtered.filter((r) => r.sub_category_id === filterSubCategory);
+      }
+      if (filterProgram) {
+        filtered = filtered.filter((r) => r.program_id === filterProgram);
+      }
     } else {
-      filtered = filtered.filter((r) => r.category_id === null);
-    }
-
-    if (filterPanchayath) {
-      filtered = filtered.filter((r) => r.panchayath_id === filterPanchayath);
-    }
-    if (filterCategory && activeTab === "completed") {
-      filtered = filtered.filter((r) => r.category_id === filterCategory);
-    }
-    if (filterSubCategory && activeTab === "completed") {
-      filtered = filtered.filter((r) => r.sub_category_id === filterSubCategory);
-    }
-    if (filterProgram && activeTab === "completed") {
-      filtered = filtered.filter((r) => r.program_id === filterProgram);
+      filtered = [...incompleteResponses];
+      
+      if (filterPanchayath) {
+        filtered = filtered.filter((r) => r.panchayath_id === filterPanchayath);
+      }
     }
 
     setFilteredResponses(filtered);
@@ -189,8 +206,9 @@ const SurveyResponses = () => {
   const handleDelete = async () => {
     if (!deleteId) return;
 
+    const tableName = activeTab === "completed" ? "survey_responses" : "incomplete_surveys";
     const { error } = await supabase
-      .from("survey_responses")
+      .from(tableName)
       .delete()
       .eq("id", deleteId);
 
@@ -203,7 +221,11 @@ const SurveyResponses = () => {
     } else {
       toast({ title: "Success", description: "Response deleted successfully" });
       setDeleteId(null);
-      fetchResponses();
+      if (activeTab === "completed") {
+        fetchResponses();
+      } else {
+        fetchIncompleteResponses();
+      }
     }
   };
 
@@ -301,7 +323,7 @@ const SurveyResponses = () => {
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Mobile</TableHead>
-                      <TableHead>Age</TableHead>
+                      {activeTab === "completed" && <TableHead>Age</TableHead>}
                       <TableHead>Panchayath</TableHead>
                       <TableHead>Ward</TableHead>
                       {activeTab === "completed" && (
@@ -320,11 +342,11 @@ const SurveyResponses = () => {
                       <TableRow key={r.id}>
                         <TableCell>{r.name}</TableCell>
                         <TableCell>{r.mobile_number}</TableCell>
-                        <TableCell>{r.age}</TableCell>
+                        {activeTab === "completed" && <TableCell>{r.age}</TableCell>}
                         <TableCell>
-                          {r.panchayaths?.name_en} / {r.panchayaths?.name_ml} ({r.panchayaths?.district})
+                          {r.panchayaths?.name_en || "—"} {r.panchayaths?.name_ml ? `/ ${r.panchayaths.name_ml}` : ""} {r.panchayaths?.district ? `(${r.panchayaths.district})` : ""}
                         </TableCell>
-                        <TableCell>{r.ward_number}</TableCell>
+                        <TableCell>{r.ward_number || "—"}</TableCell>
                         {activeTab === "completed" && (
                           <>
                             <TableCell>{r.categories?.name || "—"}</TableCell>
@@ -339,13 +361,15 @@ const SurveyResponses = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEdit(r)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
+                            {activeTab === "completed" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEdit(r)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="destructive"
                               size="sm"
